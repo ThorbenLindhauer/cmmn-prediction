@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="PredictionModelPrior">
+  
+  <resultMap id="modelResultMap" type="org.camunda.bpm.hackdays.prediction.PredictionModelPrior">
+    <id property="modelId" column="MODEL_ID_" jdbcType="VARCHAR"/>
+    <result property="describedVariable" column="DESCRIBED_VARIABLE_" jdbcType="VARCHAR"/>
+    <result property="data" column="DATA_" jdbcType="BLOB"/>
+  </resultMap>   
+  
+  <select id="select" resultMap="modelResultMap" parameterType="String">
+    select
+      MODEL_ID_,
+      DESCRIBED_VARIABLE_,
+      DATA_ 
+    from PREDICTION_MODEL
+    where
+      NAME_ = #{parameter}
+  </select>
+  
+  <insert id="insert" parameterType="org.camunda.bpm.hackdays.prediction.PredictionModel">
+    insert into PREDICTION_MODEL (
+      MODEL_ID_,
+      DESCRIBED_VARIABLE_,
+      DATA_) values (
+        #{modelId},
+        #{describedVariable},
+        #{data}
+      )
+  </insert>
+  
+  <update id="update" parameterType="org.camunda.bpm.hackdays.prediction.PredictionModel">
+    update PREDICTION_MODEL
+    set
+      MODEL_ID_ = #{modelId},
+      DESCRIBED_VARIABLE_ = #{describedVariable},
+      DATA_ = #{DATA}
+    where
+      MODEL_ID_ = #{modelId},
+      DESCRIBED_VARIABLE_ = #{describedVariable}
+  </update>
+
+</mapper>

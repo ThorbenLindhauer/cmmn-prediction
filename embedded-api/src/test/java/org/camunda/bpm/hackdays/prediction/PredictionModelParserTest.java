@@ -28,15 +28,18 @@ public class PredictionModelParserTest {
     
     DiscreteVariable fooVariable = model.getVariables().get("foo");
     assertThat(fooVariable.getName()).isEqualTo("foo");
-    assertThat(fooVariable.getValueExpressions()).containsOnlyKeys("fooCat1", "fooCat2");
-    assertThat(fooVariable.getValueExpressions().get("fooCat1")).isEqualTo("${intVal < 100}");
-    assertThat(fooVariable.getValueExpressions().get("fooCat2")).isEqualTo("${intVal >= 100}");
+    assertThat(fooVariable.getValues()).containsOnlyKeys(0, 1);
+    assertThat(fooVariable.getValues().get(0).getExpression()).isEqualTo("${intVal < 100}");
+    assertThat(fooVariable.getValues().get(0).getName()).isEqualTo("fooCat1");
+    assertThat(fooVariable.getValues().get(1).getExpression()).isEqualTo("${intVal >= 100}");
+    assertThat(fooVariable.getValues().get(1).getName()).isEqualTo("fooCat2");
     
     DiscreteVariable barVariable = model.getVariables().get("bar");
     assertThat(barVariable.getName()).isEqualTo("bar");
-    assertThat(barVariable.getValueExpressions()).containsOnlyKeys("barCat1", "barCat2");
-    assertThat(barVariable.getValueExpressions().get("barCat1")).isEqualTo("${intVal < 50}");
-    assertThat(barVariable.getValueExpressions().get("barCat2")).isEqualTo("${intVal >= 50}");
+    assertThat(barVariable.getValues().get(0).getExpression()).isEqualTo("${intVal < 50}");
+    assertThat(barVariable.getValues().get(0).getName()).isEqualTo("barCat1");
+    assertThat(barVariable.getValues().get(1).getExpression()).isEqualTo("${intVal >= 50}");
+    assertThat(barVariable.getValues().get(1).getName()).isEqualTo("barCat2");
     
     assertThat(model.getDependencies()).containsOnlyKeys("bar");
     assertThat(model.getDependencies().get("bar")).containsExactly("foo");

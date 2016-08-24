@@ -13,6 +13,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
+import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 
 public class CmmnPredictionService {
   
@@ -32,8 +33,8 @@ public class CmmnPredictionService {
 	  new CreateModelCmd(model).execute(this);
 	}
 	
-	public void parseModel(PredictionModel model) {
-	  new ParseModelCmd(model).execute(this);
+	public ParsedPredictionModel parseModel(PredictionModel model) {
+	  return new ParseModelCmd(model).execute(this);
 	}
 	
 	public static CmmnPredictionService build(DataSource dataSource) {

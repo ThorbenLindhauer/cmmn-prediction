@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.DiscreteVariable;
+import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.VariableValue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;;
@@ -21,7 +22,7 @@ public class PredictionModelParser {
     this.objectMapper = objectMapper;
   }
 
-  public ParsedPredictionModel parse(InputStream stream) {
+  public ParsedPredictionModel parse(String modelId, InputStream stream) {
     
     JsonNode jsonNode;
     try {
@@ -44,15 +45,21 @@ public class PredictionModelParser {
       
       JsonNode variable = variables.get(variableName);
       
-      Map<String, String> expressions = new HashMap<String, String>();
-      parsedVariable.valueExpressions = expressions;
+      Map<Integer, VariableValue> values = new HashMap<Integer, VariableValue>();
+      parsedVariable.values = values;
       
       JsonNode categories = variable.get("categories");
       
       Iterator<JsonNode> categoriesIt = categories.elements();
+      int i = 0;
       while (categoriesIt.hasNext()) {
         JsonNode category = categoriesIt.next();
-        expressions.put(category.get("label").asText(), "${" + category.get("expression").asText() + "}");
+        
+        VariableValue value = new VariableValue(
+            category.get("label").asText(), 
+            "${" + category.get("expression").asText() + "}");
+        values.put(i, value);
+        i++;
       }
     }
     
@@ -75,6 +82,6 @@ public class PredictionModelParser {
       }
     }
     
-    return new ParsedPredictionModel(parsedVariables, parsedDependencies);
+    return new ParsedPredictionModel(modelId, parsedVariables, parsedDependencies);
   }
 }

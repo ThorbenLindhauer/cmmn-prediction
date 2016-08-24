@@ -8,5 +8,6 @@
 	</settings>
 	<mappers>
 		<mapper resource="mybatis/PredictionModel.xml" />
+		<mapper resource="mybatis/PredictionModelPrior.xml" />
 	</mappers>
 </configuration>
