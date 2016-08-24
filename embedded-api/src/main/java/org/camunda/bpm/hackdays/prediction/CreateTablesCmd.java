@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
 
-public class CreateTablesCmd implements Command {
+public class CreateTablesCmd implements Command<Void> {
 
 	public static final String DDL_CLASSPATH_LOCATION = "sql/create.h2.sql";
 	
@@ -17,7 +17,7 @@ public class CreateTablesCmd implements Command {
 		this.dbConnection = dbConnection;
 	}
 
-	public void execute() {
+	public Void execute(CmmnPredictionService predictionService) {
 		
 		InputStream sqlStream = CreateTablesCmd.class.getClassLoader().getResourceAsStream(DDL_CLASSPATH_LOCATION);
 		byte[] sqlBytes = IoUtil.readInputStream(sqlStream, "classpath://" + DDL_CLASSPATH_LOCATION);
@@ -29,5 +29,7 @@ public class CreateTablesCmd implements Command {
 		} catch (SQLException e) {
 			throw new CmmnPredictionException("Could not create tables", e);
 		}
+		
+		return null;
 	}
 }

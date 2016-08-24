@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +35,7 @@ public class CreateTablesTest {
   @Test
   public void shouldCreateTables() throws Exception {
     // given
-    CmmnPredicitionService service = new CmmnPredicitionService();
+    CmmnPredictionService service = new CmmnPredictionService();
     
     // when
     service.createDbTables(connection);
@@ -52,4 +54,5 @@ public class CreateTablesTest {
     assertThat(rows).isEqualTo(1);
     assertThat(tableNames).containsExactly("PREDICTION_MODEL");
   }
+  
 }

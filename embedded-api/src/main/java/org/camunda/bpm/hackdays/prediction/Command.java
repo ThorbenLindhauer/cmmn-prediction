@@ -1,6 +1,6 @@
 package org.camunda.bpm.hackdays.prediction;
 
-public interface Command {
+public interface Command<T> {
 
-	void execute();
+	T execute(CmmnPredictionService predictionService);
 }
