@@ -4,4 +4,65 @@
   <artifactId>embedded-api</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
+  
+  
+  <properties>
+    <version.camunda>7.5.0</version.camunda>
+    <version.graphmod>0.0.1-SNAPSHOT</version.graphmod>
+    <version.h2>1.3.168</version.h2>
+    <version.junit>4.11</version.junit>
+  </properties>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bom</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
+        <version>${version.camunda}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <dependencies>
+  	<dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+	  <groupId>com.github.thorbenlindhauer</groupId>
+	  <artifactId>graphmod-inference-engine</artifactId>
+      <version>${version.graphmod}</version>
+    </dependency>
+    
+    <dependency>
+	  <groupId>com.github.thorbenlindhauer</groupId>
+	  <artifactId>graphmod-learning</artifactId>
+      <version>${version.graphmod}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+      <version>${version.h2}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+      <version>${version.junit}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.5.2</version>
+      <scope>test</scope>
+	</dependency>
+  </dependencies>
 </project>
