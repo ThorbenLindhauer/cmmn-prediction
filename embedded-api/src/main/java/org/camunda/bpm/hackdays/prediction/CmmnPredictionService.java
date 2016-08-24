@@ -32,6 +32,10 @@ public class CmmnPredictionService {
 	  new CreateModelCmd(model).execute(this);
 	}
 	
+	public void parseModel(PredictionModel model) {
+	  new ParseModelCmd(model).execute(this);
+	}
+	
 	public static CmmnPredictionService build(DataSource dataSource) {
 	  InputStream config = CmmnPredictionService.class.getClassLoader().getResourceAsStream("mybatis/mybatis-config.xml");
 	  SqlSessionFactory sqlSessionFactory = createMyBatisSqlSessionFactory(config, dataSource);
