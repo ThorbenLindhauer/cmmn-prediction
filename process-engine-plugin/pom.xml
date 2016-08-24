@@ -4,7 +4,14 @@
   <artifactId>process-engine-plugin</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  
+
+  <parent>
+    <groupId>org.camunda.bpm.hackdays</groupId>
+    <artifactId>cmmn-prediction</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm.hackdays</groupId>
