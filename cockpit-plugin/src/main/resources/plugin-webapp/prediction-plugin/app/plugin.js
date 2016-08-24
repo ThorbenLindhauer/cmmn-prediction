@@ -8,8 +8,8 @@ define(['angular'], function(angular) {
 
         ViewsProvider.registerDefaultView('cockpit.dashboard', {
             id: 'process-definitions',
-            label: 'Deployed Processes',
-            url: 'plugin://prediction-plugin/static/templates/predictions.html',
+            label: 'CMMN Predictions',
+            url: 'plugin://prediction-plugin/static/app/predictions.html',
             dashboardMenuLabel: 'Predictions',
             controller: DashboardController,
 
