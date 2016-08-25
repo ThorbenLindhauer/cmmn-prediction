@@ -9,6 +9,7 @@
     <module>embedded-api</module>
     <module>process-engine-plugin</module>
     <module>cockpit-plugin</module>
+    <module>example-application</module>
   </modules>
 
 

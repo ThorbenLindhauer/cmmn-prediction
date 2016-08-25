@@ -1,0 +1,37 @@
+{
+  "variables" : {
+    "doors" : {
+      "type" : "custom",
+      "categories" : [
+        {"label" : "Three", "expression" : "doors == 3"},
+        {"label" : "Five", "expression" : "doors == 5"}
+      ]
+    },
+    "boot_size" : {
+      "type" : "custom",
+      "categories" : [
+        {"label" : "Small", "expression" : "boot_size == 'small'"},
+        {"label" : "Medium", "expression" : "boot_size == 'medium'"},
+        {"label" : "Large", "expression" : "boot_size == 'large'"}
+      ]
+    },
+    "price" : {
+      "type" : "custom",
+      "categories" : [
+        {"label" : "Cheap", "expression" : "price < 15000"},
+        {"label" : "Expensive", "expression" : "price >= 15000"}
+      ]
+    },
+    "PlanItem_Estimate_Value" : {
+      "type" : "binary"
+    },
+    "PlanItem_Test_Drive" : {
+      "type" : "binary"
+    }
+  },
+  "dependencies" : {
+    "PlanItem_Estimate_Value" : ["price"],
+    "PlanItem_Test_Drive" : ["boot_size", "doors"],
+    "price" : ["boot_size"]
+  }
+}

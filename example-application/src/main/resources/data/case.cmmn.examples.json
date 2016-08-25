@@ -1,0 +1,38 @@
+[
+{
+  "vars": {"doors": 3, "boot_size": "small", "price": 10000},
+  "activities": []
+},
+{
+  "vars": {"doors": 3, "boot_size": "medium", "price": 30000},
+  "activities": ["PlanItem_Estimate_Value"]
+},
+{
+  "vars": {"doors": 5, "boot_size": "large", "price": 20000},
+  "activities": ["PlanItem_Test_Drive"]
+},
+{
+  "vars": {"doors": 3, "boot_size": "small", "price": 30000},
+  "activities": ["PlanItem_Estimate_Value"]
+},
+{
+  "vars": {"doors": 5, "boot_size": "medium", "price": 50000},
+  "activities": ["PlanItem_Estimate_Value", "PlanItem_Test_Drive"]
+},
+{
+  "vars": {"doors": 5, "boot_size": "small", "price": 10000},
+  "activities": ["PlanItem_Test_Drive"]
+},
+{
+  "vars": {"doors": 5, "boot_size": "small", "price": 10000},
+  "activities": []
+},
+{
+  "vars": {"doors": 3, "boot_size": "large", "price": 50000},
+  "activities": ["PlanItem_Estimate_Value", "PlanItem_Test_Drive"]
+},
+{
+  "vars": {"doors": 3, "boot_size": "large", "price": 20000},
+  "activities": ["PlanItem_Estimate_Value"]
+}
+]
