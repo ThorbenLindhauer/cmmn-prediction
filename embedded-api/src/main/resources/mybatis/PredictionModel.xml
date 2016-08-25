@@ -8,6 +8,10 @@
     <id property="id" column="ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="resource" column="RESOURCE_" jdbcType="BLOB"/>
+    <collection property="priors" 
+    	ofType="org.camunda.bpm.hackdays.prediction.PredictionModelPrior" 
+    	column="ID_" 
+    	select="PredictionModelPrior.select" />
   </resultMap>   
   
   <select id="select" resultMap="modelResultMap" parameterType="String">

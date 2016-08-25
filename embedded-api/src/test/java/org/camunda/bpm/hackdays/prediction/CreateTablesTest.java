@@ -42,17 +42,15 @@ public class CreateTablesTest {
     
     // then
     ResultSet resultSet = connection.createStatement().executeQuery("SHOW TABLES");
-    int rows = 0;
     Set<String> tableNames = new HashSet<String>();
     
     while (resultSet.next())
     {
-      rows++;
       tableNames.add(resultSet.getString(1));
     }
     
-    assertThat(rows).isEqualTo(1);
-    assertThat(tableNames).containsExactly("PREDICTION_MODEL");
+    assertThat(tableNames).hasSize(2);
+    assertThat(tableNames).contains("PREDICTION_MODEL", "PREDICTION_PRIOR");
   }
   
 }

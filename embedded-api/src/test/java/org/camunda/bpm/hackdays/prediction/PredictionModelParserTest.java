@@ -21,7 +21,7 @@ public class PredictionModelParserTest {
     InputStream inputStream = PredictionModelParserTest.class.getClassLoader().getResourceAsStream("model.json");
     
     // when
-    ParsedPredictionModel model = parser.parse(inputStream);
+    ParsedPredictionModel model = parser.parse("123", inputStream);
     
     // then
     assertThat(model.getVariables()).containsOnlyKeys("foo", "bar");
@@ -41,7 +41,8 @@ public class PredictionModelParserTest {
     assertThat(barVariable.getValues().get(1).getExpression()).isEqualTo("${intVal >= 50}");
     assertThat(barVariable.getValues().get(1).getName()).isEqualTo("barCat2");
     
-    assertThat(model.getDependencies()).containsOnlyKeys("bar");
+    assertThat(model.getDependencies()).containsOnlyKeys("foo", "bar");
     assertThat(model.getDependencies().get("bar")).containsExactly("foo");
+    assertThat(model.getDependencies().get("foo")).isEmpty();
   }
 }

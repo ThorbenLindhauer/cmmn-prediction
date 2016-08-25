@@ -1,18 +1,18 @@
 package org.camunda.bpm.hackdays.prediction.model;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
-import org.camunda.bpm.hackdays.prediction.ParsedPredictionPrior;
 import org.camunda.bpm.hackdays.prediction.PredictionModelPrior;
 
 import com.github.thorbenlindhauer.factor.DiscreteFactor;
@@ -36,19 +36,14 @@ public class ParsedPredictionModel {
   protected String id;
   protected Map<String, DiscreteVariable> variables;
   protected Map<String, List<String>> dependencies;
-  protected Map<String, ParsedPredictionPrior> priors;
   
   public ParsedPredictionModel(
       String id,
       Map<String, DiscreteVariable> variables, 
       Map<String, List<String>> dependencies) {
+    this.id = id;
     this.variables = variables;
     this.dependencies = dependencies;
-    this.priors = new HashMap<String, ParsedPredictionPrior>();
-    
-    for (ParsedPredictionPrior prior : initializePriors()) {
-      this.priors.put(prior.getDescribedVariable(), prior);
-    }
   }
 
   public static class DiscreteVariable {
@@ -140,63 +135,37 @@ public class ParsedPredictionModel {
     return scopeBuilder.buildScope();
   }
   
-  public List<PredictionModelPrior> toRawPriors() {
+  public List<PredictionModelPrior> generateRawPriors() {
     List<PredictionModelPrior> priors = new ArrayList<PredictionModelPrior>();
     
-    for (ParsedPredictionPrior parsedPrior : this.priors.values()) {
+    for (Entry<String, List<String>> dependency : dependencies.entrySet()) {
       PredictionModelPrior rawPrior = new PredictionModelPrior();
       
       rawPrior.setModelId(id);
-      rawPrior.setDescribedVariable(parsedPrior.getDescribedVariable());
-
-      byte[] data = null;
+      rawPrior.setDescribedVariable(dependency.getKey());
       
-      if (parsedPrior.getPriorTables() != null) {
-        ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
-        try {
-          ObjectOutputStream outStream = new ObjectOutputStream(byteOutStream);
-          outStream.writeObject(parsedPrior.getPriorTables());
-          data = byteOutStream.toByteArray();
-        } catch (Exception e) {
-          throw new CmmnPredictionException("Cannot serialize prior distribution", e);
-        }
-      }
+      priors.add(rawPrior);
       
-      rawPrior.setData(data);
-    }
-    
-    return priors;
-    
-  }
-  
-  public List<ParsedPredictionPrior> initializePriors() {
-    List<ParsedPredictionPrior> priors = new ArrayList<ParsedPredictionPrior>();
-    
-    for (Map.Entry<String, List<String>> dependency : dependencies.entrySet()) {
-      String describedVariable = dependency.getKey();
-      
-      ParsedPredictionPrior prior = new ParsedPredictionPrior(id, describedVariable);
-      priors.add(prior);
     }
     
     return priors;
   }
   
-  public List<ConditionalDiscreteDistributionPrior> toPriors() {
+  public List<ConditionalDiscreteDistributionPrior> toPriors(List<PredictionModelPrior> priors) {
     
     Scope scope = toScope();
 
-    List<ConditionalDiscreteDistributionPrior> priors = new ArrayList<ConditionalDiscreteDistributionPrior>();
+    List<ConditionalDiscreteDistributionPrior> graphicalModelPriors = new ArrayList<ConditionalDiscreteDistributionPrior>();
     
-    for (ParsedPredictionPrior parsedPrior : this.priors.values()) {
-      String describedVariable = parsedPrior.getDescribedVariable();
+    for (PredictionModelPrior prior : priors) {
+      String describedVariable = prior.getDescribedVariable();
       List<String> dependencies = this.dependencies.get(describedVariable);
       Scope conditioningScope = scope.subScope(dependencies);
       Scope distributionScope = conditioningScope.union(scope.subScope(describedVariable));
       
-      DirichletPriorInitializer priorInitializer = new PersistentPriorInitializer();
+      DirichletPriorInitializer priorInitializer = new PersistentPriorInitializer(prior.getPrior());
       
-      if (parsedPrior.getPriorTables() == null) {
+      if (prior.getPrior() == null) {
         priorInitializer = new UniformDirichletPriorInitializer();
       }
       
@@ -204,33 +173,45 @@ public class ParsedPredictionModel {
           distributionScope,
           conditioningScope,
           priorInitializer);
-      priors.add(modelPrior);
+      graphicalModelPriors.add(modelPrior);
     }
     
-    return priors;
+    return graphicalModelPriors;
   }
   
-  public void updatePriors(List<ConditionalDiscreteDistributionPrior> priors) {
-    for (ConditionalDiscreteDistributionPrior prior : priors) {
-      ParsedPredictionPrior parsedPrior = this.priors.get(prior.getDescribedScope().getVariables().iterator().next().getId()); // assuming there is exactly one variable
-      DirichletDistribution[] conditionalAssignmentPriors = prior.getPriors();
-      double[][] tables = new double[prior.getDescribedScope().getNumDistinctValues()][conditionalAssignmentPriors.length];
+  public void updatePriors(List<ConditionalDiscreteDistributionPrior> graphicalModelPriors, List<PredictionModelPrior> persistentPriors) {
+    Map<String, PredictionModelPrior> persistentPriorMap = new HashMap<String, PredictionModelPrior>();
+    for (PredictionModelPrior prior : persistentPriors) {
+      persistentPriorMap.put(prior.getDescribedVariable(), prior);
+    }
+    
+    for (ConditionalDiscreteDistributionPrior modelPrior : graphicalModelPriors) {
+      Scope describedScope = modelPrior.getDescribedScope();
+      String describedVariable = describedScope.getVariables().iterator().next().getId(); // assuming there is exactly one variable
+      PredictionModelPrior persistentPrior = persistentPriorMap.get(describedVariable);
+      DirichletDistribution[] conditionalAssignmentPriors = modelPrior.getPriors();
+      
+      double[][] tables = new double[describedScope.getNumDistinctValues()][conditionalAssignmentPriors.length];
       
       for (int i = 0; i < conditionalAssignmentPriors.length; i++) {
         tables[i] = conditionalAssignmentPriors[i].getParameters();
       }
       
-      parsedPrior.setPriorTables(tables);
+      persistentPrior.setPrior(tables);
     }
   }
   
-  public class PersistentPriorInitializer implements DirichletPriorInitializer {
+  public static class PersistentPriorInitializer implements DirichletPriorInitializer {
+
+    protected double[][] tables;
+    
+    public PersistentPriorInitializer(double[][] tables) {
+      this.tables = tables;
+    }
 
     public void initialize(DirichletDistribution prior, Scope describingScope, Scope conditioningScope, int[] conditioningAssignment) {
       int priorIndex = conditioningScope.getIndexCoder().getIndexForAssignment(conditioningAssignment);
-      ParsedPredictionPrior parsedPredictionPrior = 
-         priors.get(describingScope.getDiscreteVariables().iterator().next().getId()); // assuming describing scope has exactly one variable
-      double[] table = parsedPredictionPrior.getPriorTables()[priorIndex];
+      double[] table = tables[priorIndex];
       prior.setParameters(table);
     }
     

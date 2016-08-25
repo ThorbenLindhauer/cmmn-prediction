@@ -2,10 +2,13 @@ package org.camunda.bpm.hackdays.prediction.model;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.DiscreteVariable;
@@ -80,6 +83,13 @@ public class PredictionModelParser {
         String parentVariableName = parentVariableNames.next().asText();
         parentVariables.add(parentVariableName);
       }
+    }
+    
+    Set<String> remainingVariables = new HashSet<String>(parsedVariables.keySet());
+    remainingVariables.removeAll(parsedDependencies.keySet());
+    
+    for (String variable : remainingVariables) {
+      parsedDependencies.put(variable, Collections.<String>emptyList());
     }
     
     return new ParsedPredictionModel(modelId, parsedVariables, parsedDependencies);

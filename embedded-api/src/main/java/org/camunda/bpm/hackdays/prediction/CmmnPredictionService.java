@@ -17,6 +17,7 @@ import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 
 public class CmmnPredictionService {
   
+  protected DataSource dataSource;
   protected SqlSessionFactory sqlSessionFactory;
 
   // TODO: perhaps this should internally get a connection from datasource
@@ -25,12 +26,20 @@ public class CmmnPredictionService {
 		new CreateTablesCmd(dbConnection).execute(this);
 	}
 	
+	public void dropDbTables(Connection dbConnection) {
+	  new DropTablesCmd(dbConnection).execute(this);
+	}
+	
 	public PredictionModel getModel(String name) {
 	  return new GetModelCmd(name).execute(this);
 	}
 	
 	public void insertModel(PredictionModel model) {
 	  new CreateModelCmd(model).execute(this);
+	}
+	
+	public void updateModel(PredictionModel model) {
+	  new UpdateModelCmd(model).execute(this);
 	}
 	
 	public ParsedPredictionModel parseModel(PredictionModel model) {
@@ -43,6 +52,7 @@ public class CmmnPredictionService {
 	  
 	  CmmnPredictionService service = new CmmnPredictionService();
 	  service.sqlSessionFactory = sqlSessionFactory;
+	  service.dataSource = dataSource;
 	  return service;
 	}
 	

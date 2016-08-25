@@ -16,6 +16,12 @@ public class CreateModelCmd implements Command<Void> {
     try {
       sqlSession = predictionService.sqlSessionFactory.openSession();
       sqlSession.insert("PredictionModel.insert", model);
+      if (model.getPriors() != null) {
+        for (PredictionModelPrior prior : model.getPriors()) {
+          sqlSession.insert("PredictionModelPrior.insert", prior);
+        }
+      }
+      
     } finally {
       sqlSession.close();
     }

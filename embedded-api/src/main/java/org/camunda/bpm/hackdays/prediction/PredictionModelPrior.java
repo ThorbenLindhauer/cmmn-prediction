@@ -1,5 +1,10 @@
 package org.camunda.bpm.hackdays.prediction;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 public class PredictionModelPrior {
 
   protected String modelId;
@@ -24,4 +29,30 @@ public class PredictionModelPrior {
   public void setData(byte[] data) {
     this.data = data;
   }
+  
+  // TODO: could also cache this field
+  public double[][] getPrior() {
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
+    
+    try {
+      ObjectInputStream objectStream = new ObjectInputStream(byteStream);
+      return (double[][]) objectStream.readObject();
+    } catch (Exception e) {
+      throw new CmmnPredictionException("Could not read prior tables", e);
+    }
+  }
+  public void setPrior(double[][] tables) {
+    
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    
+    try {
+      ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
+      objectStream.writeObject(tables);
+    } catch (Exception e) {
+      throw new CmmnPredictionException("could not write prior tables", e);
+    }
+    
+    data = byteStream.toByteArray();
+  }
+  
 }

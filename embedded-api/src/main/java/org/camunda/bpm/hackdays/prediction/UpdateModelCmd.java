@@ -15,7 +15,7 @@ public class UpdateModelCmd implements Command<Void> {
     
     try {
       sqlSession = predictionService.sqlSessionFactory.openSession();
-      sqlSession.update("PredictionModel.update", model);
+//      sqlSession.update("PredictionModel.update", model); // model is immutable for now
       
       for (PredictionModelPrior prior : model.getPriors()) {
         sqlSession.update("PredictionModelPrior.update", prior);

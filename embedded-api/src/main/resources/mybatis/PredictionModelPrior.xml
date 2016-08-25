@@ -15,31 +15,32 @@
       MODEL_ID_,
       DESCRIBED_VARIABLE_,
       DATA_ 
-    from PREDICTION_MODEL
+    from PREDICTION_PRIOR
     where
-      NAME_ = #{parameter}
+      MODEL_ID_ = #{parameter}
   </select>
   
-  <insert id="insert" parameterType="org.camunda.bpm.hackdays.prediction.PredictionModel">
-    insert into PREDICTION_MODEL (
+  <insert id="insert" parameterType="org.camunda.bpm.hackdays.prediction.PredictionModelPrior">
+    insert into PREDICTION_PRIOR (
       MODEL_ID_,
       DESCRIBED_VARIABLE_,
-      DATA_) values (
+      DATA_) 
+    values (
         #{modelId},
         #{describedVariable},
         #{data}
       )
   </insert>
   
-  <update id="update" parameterType="org.camunda.bpm.hackdays.prediction.PredictionModel">
-    update PREDICTION_MODEL
+  <update id="update" parameterType="org.camunda.bpm.hackdays.prediction.PredictionModelPrior">
+    update PREDICTION_PRIOR
     set
       MODEL_ID_ = #{modelId},
       DESCRIBED_VARIABLE_ = #{describedVariable},
-      DATA_ = #{DATA}
+      DATA_ = #{data}
     where
-      MODEL_ID_ = #{modelId},
-      DESCRIBED_VARIABLE_ = #{describedVariable}
+      MODEL_ID_ = #{modelId}
+      and DESCRIBED_VARIABLE_ = #{describedVariable}
   </update>
 
 </mapper>

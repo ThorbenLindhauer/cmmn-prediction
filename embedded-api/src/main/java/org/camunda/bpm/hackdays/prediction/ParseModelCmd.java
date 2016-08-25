@@ -18,6 +18,6 @@ public class ParseModelCmd implements Command<ParsedPredictionModel> {
   public ParsedPredictionModel execute(CmmnPredictionService predictionService) {
     PredictionModelParser parser = new PredictionModelParser(new ObjectMapper());
     
-    return parser.parse(new ByteArrayInputStream(model.getResource()));
+    return parser.parse(model.getId(), new ByteArrayInputStream(model.getResource()));
   }
 }
