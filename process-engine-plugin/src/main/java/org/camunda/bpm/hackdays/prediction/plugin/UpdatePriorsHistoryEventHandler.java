@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
@@ -89,6 +90,16 @@ public class UpdatePriorsHistoryEventHandler implements HistoryEventHandler {
     }
 
     public void execute(CommandContext commandContext) {
+      commandContext.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Object>() {
+
+        public Object execute(CommandContext commandContext) {
+          doExecute(commandContext);
+          return null;
+        }
+      });
+    }
+
+    public void doExecute(CommandContext commandContext) {
       // 2. retrieve all the values for the variables and evaluate expressions
       // TODO: we could cache the parsed models
       ParsedPredictionModel parsedModel = predictionService.parseModel(predictionModel);
