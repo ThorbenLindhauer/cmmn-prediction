@@ -8,6 +8,8 @@ import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.Map;
  * @author Askar Akhmerov
  */
 public class CaseDefinitionResource extends AbstractCockpitPluginResource {
-  private CmmnPredictionService predictionService;
+  private static CmmnPredictionService predictionService;
 
   public CaseDefinitionResource(String engineName) {
     super(engineName);
