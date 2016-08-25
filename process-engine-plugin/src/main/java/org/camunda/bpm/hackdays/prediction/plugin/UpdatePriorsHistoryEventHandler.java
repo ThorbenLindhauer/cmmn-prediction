@@ -8,18 +8,16 @@ import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.el.Expression;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
 import org.camunda.bpm.hackdays.prediction.PredictionModel;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.DiscreteVariable;
-import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.VariableValue;
+
+import com.github.thorbenlindhauer.learning.prior.ConditionalDiscreteDistributionPrior;
 
 public class UpdatePriorsHistoryEventHandler implements HistoryEventHandler {
 
@@ -78,9 +76,29 @@ public class UpdatePriorsHistoryEventHandler implements HistoryEventHandler {
 
           // TODO: 
           // 3. Get all priors
-          predictionMod
+          Map<String, ConditionalDiscreteDistributionPrior> modelPriors = parsedModel.toPriors(predictionModel.getPriors());
           
           // 4. for each prior, collect variables and update accordingly
+          for (Map.Entry<String, ConditionalDiscreteDistributionPrior> priorEntry : modelPriors.entrySet()) {
+            String describedVariable = priorEntry.getKey();
+            ConditionalDiscreteDistributionPrior prior = priorEntry.getValue();
+            
+            int describedValue = groundVariableValues.get(describedVariable);
+            
+            String[] conditioningVariables = prior.getConditioningScope().getVariableIds();
+            int[] conditioningAssignment = new int[conditioningVariables.length];
+            
+            for (int i = 0; i < conditioningVariables.length; i++) {
+              conditioningAssignment[i] = groundVariableValues.get(conditioningVariables[i]);
+            }
+            
+            prior.submitEvidence(conditioningAssignment, describedValue);
+          }
+          
+          // 5. update and persist model
+          parsedModel.updatePriors(modelPriors.values(), predictionModel.getPriors());
+          
+          predictionService.updateModel(predictionModel);
         }
       });
     

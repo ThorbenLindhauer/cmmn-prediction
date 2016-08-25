@@ -7,23 +7,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.el.ArrayELResolver;
+import javax.el.BeanELResolver;
+import javax.el.CompositeELResolver;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
+import javax.el.ListELResolver;
+import javax.el.MapELResolver;
+import javax.el.ResourceBundleELResolver;
 import javax.el.ValueExpression;
 
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
 import org.camunda.bpm.hackdays.prediction.PredictionModelPrior;
+import org.camunda.bpm.hackdays.prediction.RootMapELResolver;
 
 import com.github.thorbenlindhauer.factor.DiscreteFactor;
 import com.github.thorbenlindhauer.learning.distribution.DirichletDistribution;
 import com.github.thorbenlindhauer.learning.prior.ConditionalDiscreteDistributionPrior;
 import com.github.thorbenlindhauer.learning.prior.DirichletPriorInitializer;
 import com.github.thorbenlindhauer.learning.prior.UniformDirichletPriorInitializer;
-import com.github.thorbenlindhauer.network.DiscreteFactorBuilder;
 import com.github.thorbenlindhauer.network.DiscreteModelBuilder;
 import com.github.thorbenlindhauer.network.DiscreteModelBuilderImpl;
 import com.github.thorbenlindhauer.network.GraphicalModel;
-import com.github.thorbenlindhauer.network.ModelBuilder;
 import com.github.thorbenlindhauer.network.ScopeBuilder;
 import com.github.thorbenlindhauer.variable.Scope;
 
@@ -47,6 +52,17 @@ public class ParsedPredictionModel {
   }
 
   public static class DiscreteVariable {
+    protected static final ELResolver EL_RESOLVER = new CompositeELResolver() {
+      {
+        add(new RootMapELResolver());
+        add(new ArrayELResolver(true));
+        add(new ListELResolver(true));
+        add(new MapELResolver(true));
+        add(new ResourceBundleELResolver());
+        add(new BeanELResolver(true));
+      }
+    };
+    
     protected String name;
     protected Map<Integer, VariableValue> values;
     
@@ -57,8 +73,7 @@ public class ParsedPredictionModel {
       ExpressionFactory expressionFactory = new ExpressionFactoryImpl();
       
       SimpleContext juelContext = new SimpleContext();
-      ELResolver resolver = new SimpleResolver();
-      juelContext.setELResolver(resolver);
+      juelContext.setELResolver(EL_RESOLVER);
       juelContext.putContext(Map.class, variables);
       
       for (Map.Entry<Integer, VariableValue> value : values.entrySet()) {
