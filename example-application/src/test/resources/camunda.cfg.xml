@@ -32,7 +32,7 @@
     <!-- engine plugins -->
     <property name="processEnginePlugins">
       <list>
-<!--         <ref bean="cmmnPredictionPlugin" /> -->
+        <ref bean="cmmnPredictionPlugin" />
       </list>
     </property>
 
@@ -43,6 +43,6 @@
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->
 
   <!-- engine plugin beans -->
-<!--   <bean id="cmmnPredictionPlugin" class="org.camunda.bpm.hackdays.prediction.plugin.CmmnPredictionPlugin" /> -->
+  <bean id="cmmnPredictionPlugin" class="org.camunda.bpm.hackdays.prediction.plugin.CmmnPredictionPlugin" />
 
 </beans>
