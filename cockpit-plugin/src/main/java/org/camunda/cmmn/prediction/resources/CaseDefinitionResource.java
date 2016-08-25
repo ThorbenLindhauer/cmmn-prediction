@@ -32,7 +32,7 @@ public class CaseDefinitionResource extends AbstractCockpitPluginResource {
 
   protected List<CasePredictionTO> queryPredictions(String caseDefinition) {
     List<CasePredictionTO> result = new ArrayList<CasePredictionTO>();
-    Map<String, Double> estimations = this.getPredictionService().estimate(caseDefinition, "bar", new HashMap<String, Object>());
+    Map<String, Double> estimations = this.getPredictionService().estimate(caseDefinition, "bar", new HashMap<String, Integer>(), new HashMap<String, Object>());
     for (Map.Entry<String,Double> estimation : estimations.entrySet()) {
       CasePredictionTO toAdd = new CasePredictionTO();
       toAdd.setActivityId(estimation.getKey());
