@@ -32,6 +32,10 @@ public class PredictionModelPrior {
   
   // TODO: could also cache this field
   public double[][] getPrior() {
+    if (data == null) {
+      return null;
+    }
+    
     ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
     
     try {

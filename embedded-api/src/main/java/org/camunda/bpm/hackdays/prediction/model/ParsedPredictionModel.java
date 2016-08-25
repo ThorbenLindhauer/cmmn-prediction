@@ -151,11 +151,11 @@ public class ParsedPredictionModel {
     return priors;
   }
   
-  public List<ConditionalDiscreteDistributionPrior> toPriors(List<PredictionModelPrior> priors) {
+  public Map<String, ConditionalDiscreteDistributionPrior> toPriors(List<PredictionModelPrior> priors) {
     
     Scope scope = toScope();
 
-    List<ConditionalDiscreteDistributionPrior> graphicalModelPriors = new ArrayList<ConditionalDiscreteDistributionPrior>();
+    Map<String, ConditionalDiscreteDistributionPrior> graphicalModelPriors = new HashMap<String, ConditionalDiscreteDistributionPrior>();
     
     for (PredictionModelPrior prior : priors) {
       String describedVariable = prior.getDescribedVariable();
@@ -173,7 +173,8 @@ public class ParsedPredictionModel {
           distributionScope,
           conditioningScope,
           priorInitializer);
-      graphicalModelPriors.add(modelPrior);
+      
+      graphicalModelPriors.put(describedVariable, modelPrior);
     }
     
     return graphicalModelPriors;
