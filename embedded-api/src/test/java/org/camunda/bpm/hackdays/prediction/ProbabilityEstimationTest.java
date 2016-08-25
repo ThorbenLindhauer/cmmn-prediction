@@ -38,7 +38,7 @@ public class ProbabilityEstimationTest {
     predictionService.insertModel(model);
     
     // when
-    Map<String, Double> estimate = predictionService.estimate("foo", "bar", Collections.<String, Integer>emptyMap(), Collections.<String, Object>singletonMap("intVal", 75));
+    Map<String, Double> estimate = predictionService.estimate(model, "bar", Collections.<String, Integer>emptyMap(), Collections.<String, Object>singletonMap("intVal", 75));
     
     // then
     assertThat(estimate.size()).isEqualTo(2);

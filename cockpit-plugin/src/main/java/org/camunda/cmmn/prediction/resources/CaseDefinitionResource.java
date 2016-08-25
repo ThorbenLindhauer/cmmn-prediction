@@ -1,6 +1,7 @@
 package org.camunda.cmmn.prediction.resources;
 
 import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginResource;
+import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionDto;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
 import javax.ws.rs.POST;
@@ -19,9 +20,8 @@ public class CaseDefinitionResource extends AbstractCockpitPluginResource {
 
   @POST
   @Path("{caseDefinition}")
-  public CaseInstance startDefinition(@PathParam("caseDefinition") String caseDefinition) {
-    System.out.println("CASE DEF [" + caseDefinition + "]");
-    return getProcessEngine().getCaseService().withCaseDefinition(caseDefinition).create();
+  public CaseExecutionDto startDefinition(@PathParam("caseDefinition") String caseDefinition) {
+    return CaseExecutionDto.fromCaseExecution(getProcessEngine().getCaseService().withCaseDefinition(caseDefinition).create());
   }
 
 

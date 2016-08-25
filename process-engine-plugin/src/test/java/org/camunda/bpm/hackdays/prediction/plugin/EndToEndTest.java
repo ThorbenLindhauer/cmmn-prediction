@@ -13,6 +13,7 @@ import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
+import org.camunda.bpm.hackdays.prediction.PredictionModel;
 import org.camunda.bpm.hackdays.prediction.model.PredictionModelParser;
 import org.junit.After;
 import org.junit.Before;
@@ -72,8 +73,8 @@ public class EndToEndTest {
     caseService
       .withCaseDefinition(caseDefinition.getId())
       .create();
-    
-    Map<String, Double> estimation = predictionService.estimate(caseDefinition.getId(), "bar", new HashMap<String, Integer>(), new HashMap<String, Object>());
+    PredictionModel model = predictionService.getModel(caseDefinition.getId());
+    Map<String, Double> estimation = predictionService.estimate(model, "bar", new HashMap<String, Integer>(), new HashMap<String, Object>());
     assertThat(estimation.size()).isEqualTo(2);
     assertThat(estimation.get("barCat2")).isGreaterThan(estimation.get("barCat1"));
   }
@@ -102,9 +103,10 @@ public class EndToEndTest {
     caseService.withCaseExecution(caseInstance.getId()).close();
     
     // when
-    
+
+    PredictionModel model = predictionService.getModel(caseDefinition.getId());
     Map<String, Double> estimation = predictionService.estimate(
-        caseDefinition.getId(), 
+        model,
         "PlanItem_1", 
         new HashMap<String, Integer>(), 
         new HashMap<String, Object>());
@@ -112,7 +114,7 @@ public class EndToEndTest {
     Double probabilityPerformActivity = estimation.get(PredictionModelParser.VARIABLE_TYPE_BINARY_TRUE);
     
     Map<String, Double> estimationGivenValue = predictionService.estimate(
-        caseDefinition.getId(), 
+        model,
         "PlanItem_1", 
         new HashMap<String, Integer>(), 
         Collections.<String, Object>singletonMap("intVal", 60));
