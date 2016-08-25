@@ -1,12 +1,12 @@
 define(['angular'
-    //, 'components/prediction-instance-list'
+    , './components/prediction-instance-list'
 ], function(angular
-    //, List
+    ,PI
 ) {
     var ngModule = angular.module('cockpit.plugin.prediction-plugin', []);
 
     var CaseDefinitionController = ["$scope", 'camAPI', "$http","Uri", function($scope, camAPI, $http,Uri) {
-
+        console.log(PI);
         //var url = Uri.appUri("plugin://prediction-plugin/static/app/components/prediction-instance-list.js");
         $http.get(Uri.appUri("plugin://prediction-plugin/:engine/predictions/" + $scope.definition.id))
             .success(function(data) {

@@ -1,16 +1,13 @@
 package org.camunda.bpm.hackdays.prediction.plugin;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
-import org.camunda.bpm.hackdays.prediction.PredictionModelPersistenceTest;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class PredictionTestRule extends TestWatcher {
 

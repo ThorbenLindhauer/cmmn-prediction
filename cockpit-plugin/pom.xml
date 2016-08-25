@@ -16,6 +16,8 @@
   </parent>
   
   <dependencies>
+
+
     <dependency>
       <groupId>org.camunda.bpm.hackdays</groupId>
       <artifactId>embedded-api</artifactId>
@@ -28,6 +30,14 @@
       <classifier>classes</classifier>
       <version>${camunda.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.hackdays</groupId>
+      <artifactId>embedded-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+
 
     <dependency>
       <groupId>org.jboss.spec</groupId>
@@ -55,6 +65,13 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <version>${camunda.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
