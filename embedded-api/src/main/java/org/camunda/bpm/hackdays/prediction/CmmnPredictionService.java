@@ -3,6 +3,7 @@ package org.camunda.bpm.hackdays.prediction;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -44,6 +45,15 @@ public class CmmnPredictionService {
 	
 	public ParsedPredictionModel parseModel(PredictionModel model) {
 	  return new ParseModelCmd(model).execute(this);
+	}
+	
+	/**
+	 * For the given variable, estimate the marginal probability.
+	 * 
+	 * @return
+	 */
+	public Map<String, Double> estimate(String modelName, String variableName, Map<String, Object> variableEvidence) {
+	  return new EstimateDistributionCmd(modelName, variableName, variableEvidence).execute(this);
 	}
 	
 	public static CmmnPredictionService build(DataSource dataSource) {

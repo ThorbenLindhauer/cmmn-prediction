@@ -15,5 +15,6 @@ public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
         new CompositeDbHistoryEventHandler(new UpdatePriorsHistoryEventHandler(cmmnPredictionService)));
     
     processEngineConfiguration.getDeployers().add(new PredictionModelDeployer(cmmnPredictionService));
+    processEngineConfiguration.getDeploymentCache().getDeployers().add(new PredictionModelDeployer(cmmnPredictionService));
   }
 }
