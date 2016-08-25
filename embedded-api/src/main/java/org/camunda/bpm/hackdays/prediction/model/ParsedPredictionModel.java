@@ -21,6 +21,7 @@ import com.github.thorbenlindhauer.learning.prior.DirichletPriorInitializer;
 import com.github.thorbenlindhauer.learning.prior.UniformDirichletPriorInitializer;
 import com.github.thorbenlindhauer.network.DiscreteFactorBuilder;
 import com.github.thorbenlindhauer.network.DiscreteModelBuilder;
+import com.github.thorbenlindhauer.network.DiscreteModelBuilderImpl;
 import com.github.thorbenlindhauer.network.GraphicalModel;
 import com.github.thorbenlindhauer.network.ModelBuilder;
 import com.github.thorbenlindhauer.network.ScopeBuilder;
@@ -111,17 +112,14 @@ public class ParsedPredictionModel {
     return variables;
   }
   
-  public GraphicalModel<DiscreteFactor> toGraphicalModel() {
-    // TODO: build graphical model here; Must take a list of prior distributions
+  public GraphicalModel<DiscreteFactor> toGraphicalModel(Collection<ConditionalDiscreteDistributionPrior> modelPriors) {
+    DiscreteModelBuilder modelBuilder = new DiscreteModelBuilderImpl(toScope());
     
-    ScopeBuilder scopeBuilder = GraphicalModel.create();
-    for (DiscreteVariable variable : variables.values()) {
-      scopeBuilder.discreteVariable(variable.name, variable.values.size());
+    for (ConditionalDiscreteDistributionPrior modelPrior : modelPriors) {
+      modelBuilder.factor().scope(modelPrior.getScope().getVariableIds()).basedOnTable(modelPrior.toCanonicalValueVector());
     }
     
-    ModelBuilder<DiscreteFactor, DiscreteFactorBuilder<DiscreteModelBuilder>> modelBuilder = scopeBuilder.discreteNetwork();
-    
-    return null;
+    return modelBuilder.build();
   }
   
   public Scope toScope() {
