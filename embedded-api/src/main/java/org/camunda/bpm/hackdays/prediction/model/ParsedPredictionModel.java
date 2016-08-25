@@ -1,12 +1,11 @@
 package org.camunda.bpm.hackdays.prediction.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
@@ -180,7 +179,7 @@ public class ParsedPredictionModel {
     return graphicalModelPriors;
   }
   
-  public void updatePriors(List<ConditionalDiscreteDistributionPrior> graphicalModelPriors, List<PredictionModelPrior> persistentPriors) {
+  public void updatePriors(Collection<ConditionalDiscreteDistributionPrior> graphicalModelPriors, Collection<PredictionModelPrior> persistentPriors) {
     Map<String, PredictionModelPrior> persistentPriorMap = new HashMap<String, PredictionModelPrior>();
     for (PredictionModelPrior prior : persistentPriors) {
       persistentPriorMap.put(prior.getDescribedVariable(), prior);
@@ -192,7 +191,7 @@ public class ParsedPredictionModel {
       PredictionModelPrior persistentPrior = persistentPriorMap.get(describedVariable);
       DirichletDistribution[] conditionalAssignmentPriors = modelPrior.getPriors();
       
-      double[][] tables = new double[describedScope.getNumDistinctValues()][conditionalAssignmentPriors.length];
+      double[][] tables = new double[conditionalAssignmentPriors.length][];
       
       for (int i = 0; i < conditionalAssignmentPriors.length; i++) {
         tables[i] = conditionalAssignmentPriors[i].getParameters();

@@ -1,0 +1,12 @@
+{
+  "variables" : {
+    "foo" : {
+      "categories" : [
+        {"label" : "fooCat1", "expression" : "intVal < 100"},
+        {"label" : "fooCat2", "expression" : "intVal >= 100"}
+      ]
+    }
+  },
+  "dependencies" : {
+  }
+}
