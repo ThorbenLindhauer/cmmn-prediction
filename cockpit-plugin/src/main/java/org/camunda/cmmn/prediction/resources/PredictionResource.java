@@ -58,13 +58,13 @@ public class PredictionResource extends AbstractCockpitPluginResource {
       planItemIds.add(execution.getActivityId());
     }
     
-    PredictionModel model = predictionService.getModel(caseDefinitionId);
+    PredictionModel model = this.getPredictionService().getModel(caseDefinitionId);
     
     if (model == null) {
       throw new RuntimeException("Model with name " + caseDefinitionId + " does not exist");
     }
     
-    ParsedPredictionModel parsedModel = predictionService.parseModel(model);
+    ParsedPredictionModel parsedModel = this.getPredictionService().parseModel(model);
     
     for (String planItemId : planItemIds) {
       if (!parsedModel.getVariables().containsKey(planItemId)) {
