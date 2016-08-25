@@ -2,7 +2,7 @@ package org.camunda.cmmn.prediction;
 
 
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
-import org.camunda.cmmn.prediction.resources.PredictionPluginRootResource;
+import org.camunda.cmmn.prediction.resources.ControlPluginRootResource;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +10,9 @@ import java.util.Set;
 /**
  * @author Askar Akhmerov
  */
-public class PredictionPlugin extends AbstractCockpitPlugin {
+public class ControlPlugin extends AbstractCockpitPlugin {
 
-  public static final String ID = "prediction-plugin";
+  public static final String ID = "control-plugin";
 
   public String getId() {
     return ID;
@@ -23,7 +23,7 @@ public class PredictionPlugin extends AbstractCockpitPlugin {
   public Set<Class<?>> getResourceClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(PredictionPluginRootResource.class);
+    classes.add(ControlPluginRootResource.class);
 
     return classes;
   }
