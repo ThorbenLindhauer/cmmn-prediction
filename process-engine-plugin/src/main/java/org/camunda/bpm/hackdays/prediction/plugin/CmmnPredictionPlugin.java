@@ -7,12 +7,13 @@ import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
 
 public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
 
-  
   @Override
   public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     CmmnPredictionService cmmnPredictionService = CmmnPredictionService.build(processEngineConfiguration.getDataSource());
     
     processEngineConfiguration.setHistoryEventHandler(
         new CompositeDbHistoryEventHandler(new UpdatePriorsHistoryEventHandler(cmmnPredictionService)));
+    
+    processEngineConfiguration.getDeployers().add(new PredictionModelDeployer(cmmnPredictionService));
   }
 }
