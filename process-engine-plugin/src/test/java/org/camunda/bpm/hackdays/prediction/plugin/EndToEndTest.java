@@ -2,15 +2,18 @@ package org.camunda.bpm.hackdays.prediction.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
+import org.camunda.bpm.hackdays.prediction.model.PredictionModelParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -70,18 +73,51 @@ public class EndToEndTest {
       .withCaseDefinition(caseDefinition.getId())
       .create();
     
-    Map<String, Double> estimation = predictionService.estimate(caseDefinition.getId(), "bar", new HashMap<String, Object>());
+    Map<String, Double> estimation = predictionService.estimate(caseDefinition.getId(), "bar", new HashMap<String, Integer>(), new HashMap<String, Object>());
     assertThat(estimation.size()).isEqualTo(2);
     assertThat(estimation.get("barCat2")).isGreaterThan(estimation.get("barCat1"));
-    
-    
-    
   }
   
   @Test
   public void shouldEstimateActivityVariable() {
-    // TODO: implement
+    // given
+    deploymentId = repositoryService.createDeployment()
+      .addClasspathResource("twoTasksCase.cmmn")
+      .addInputStream("twoTasksCase.cmmn.json", EndToEndTest.class.getClassLoader().getResourceAsStream("model-with-binary-var.json"))
+      .deploy()
+      .getId();
+    
+    CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+    
+    CaseInstance caseInstance = caseService
+      .withCaseDefinition(caseDefinition.getId())
+      .setVariable("intVal", 75)
+      .create();
+    
+    CaseExecution caseExecution = caseService.createCaseExecutionQuery().activityId("PlanItem_1").singleResult();
+    caseService.withCaseExecution(caseExecution.getId()).manualStart();
+    caseService.withCaseExecution(caseExecution.getId()).complete();
+
+    caseService.withCaseExecution(caseInstance.getId()).complete();
+    caseService.withCaseExecution(caseInstance.getId()).close();
+    
+    // when
+    
+    Map<String, Double> estimation = predictionService.estimate(
+        caseDefinition.getId(), 
+        "PlanItem_1", 
+        new HashMap<String, Integer>(), 
+        new HashMap<String, Object>());
+
+    Double probabilityPerformActivity = estimation.get(PredictionModelParser.VARIABLE_TYPE_BINARY_TRUE);
+    
+    Map<String, Double> estimationGivenValue = predictionService.estimate(
+        caseDefinition.getId(), 
+        "PlanItem_1", 
+        new HashMap<String, Integer>(), 
+        Collections.<String, Object>singletonMap("intVal", 60));
+    Double probabilityPerformActivityGivenValue = estimationGivenValue.get(PredictionModelParser.VARIABLE_TYPE_BINARY_TRUE);
+    
+    assertThat(probabilityPerformActivityGivenValue).isGreaterThan(probabilityPerformActivity);
   }
-  
-  // TODO: deploy case and model => assert that model priors are updated with every finished case instance
 }

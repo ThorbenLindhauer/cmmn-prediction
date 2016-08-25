@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.DiscreteVariable;
+import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.ExpressionBasedVariable;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.VariableValue;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,12 +20,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;;
 
 public class PredictionModelParser {
   
+  public static final String VARIABLE_TYPE_CUSTOM = "custom";
+  public static final String VARIABLE_TYPE_BINARY = "binary";
+
+  public static final String VARIABLE_TYPE_BINARY_FALSE = "false";
+  public static final String VARIABLE_TYPE_BINARY_TRUE = "true";
+  
   protected ObjectMapper objectMapper;
   
   public PredictionModelParser(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
-
+  
   public ParsedPredictionModel parse(String modelId, InputStream stream) {
     
     JsonNode jsonNode;
@@ -36,33 +43,30 @@ public class PredictionModelParser {
     
     JsonNode variables = jsonNode.get("variables");
     
+    
+    Map<String, DiscreteVariable> binaryVariables = new HashMap<String, DiscreteVariable>();
+    Map<String, ExpressionBasedVariable> expressionBasedVariables = new HashMap<String, ExpressionBasedVariable>();
+    
     Iterator<String> variableNamesIt = variables.fieldNames();
-    
-    Map<String, DiscreteVariable> parsedVariables = new HashMap<String, ParsedPredictionModel.DiscreteVariable>();
-    
     while (variableNamesIt.hasNext()) {
       String variableName = variableNamesIt.next();
-      DiscreteVariable parsedVariable = new DiscreteVariable();
-      parsedVariable.name = variableName;
-      parsedVariables.put(variableName, parsedVariable);
-      
       JsonNode variable = variables.get(variableName);
+
+      JsonNode variableType = variable.get("type");
+      if (variableType == null) {
+        throw new CmmnPredictionException("Variable attribute 'type' required");
+      }
       
-      Map<Integer, VariableValue> values = new HashMap<Integer, VariableValue>();
-      parsedVariable.values = values;
-      
-      JsonNode categories = variable.get("categories");
-      
-      Iterator<JsonNode> categoriesIt = categories.elements();
-      int i = 0;
-      while (categoriesIt.hasNext()) {
-        JsonNode category = categoriesIt.next();
-        
-        VariableValue value = new VariableValue(
-            category.get("label").asText(), 
-            "${" + category.get("expression").asText() + "}");
-        values.put(i, value);
-        i++;
+      if (VARIABLE_TYPE_CUSTOM.equals(variableType.asText())) {
+        ExpressionBasedVariable parsedVariable = parseCustomVariableValues(variableName, variable);
+        expressionBasedVariables.put(variableName, parsedVariable);
+      }
+      else if (VARIABLE_TYPE_BINARY.equals(variableType.asText())) {
+        DiscreteVariable parsedVariable = parseBinaryVariableValues(variableName);
+        binaryVariables.put(variableName, parsedVariable);
+      }
+      else {
+        throw new CmmnPredictionException("Unsupported variable type: " + variableType);
       }
     }
     
@@ -84,14 +88,55 @@ public class PredictionModelParser {
         parentVariables.add(parentVariableName);
       }
     }
-    
-    Set<String> remainingVariables = new HashSet<String>(parsedVariables.keySet());
+
+    Set<String> remainingVariables = new HashSet<String>(expressionBasedVariables.keySet());
+    remainingVariables.addAll(binaryVariables.keySet());
     remainingVariables.removeAll(parsedDependencies.keySet());
     
     for (String variable : remainingVariables) {
       parsedDependencies.put(variable, Collections.<String>emptyList());
     }
     
-    return new ParsedPredictionModel(modelId, parsedVariables, parsedDependencies);
+    return new ParsedPredictionModel(modelId, binaryVariables, expressionBasedVariables, parsedDependencies);
   }
+
+  protected ExpressionBasedVariable parseCustomVariableValues(String variableName, JsonNode variable) {
+
+    ExpressionBasedVariable parsedVariable = new ExpressionBasedVariable();
+    parsedVariable.name = variableName;
+    
+    Map<Integer, VariableValue> values = new HashMap<Integer, VariableValue>();
+    parsedVariable.values = values;
+    
+    JsonNode categories = variable.get("categories");
+    
+    Iterator<JsonNode> categoriesIt = categories.elements();
+    int i = 0;
+    while (categoriesIt.hasNext()) {
+      JsonNode category = categoriesIt.next();
+      
+      VariableValue value = new VariableValue(
+          category.get("label").asText(), 
+          "${" + category.get("expression").asText() + "}");
+      values.put(i, value);
+      i++;
+    }
+  
+    return parsedVariable;
+  }
+
+  protected DiscreteVariable parseBinaryVariableValues(String variableName) {
+    DiscreteVariable parsedVariable = new DiscreteVariable();
+    parsedVariable.name = variableName;
+    parsedVariable.values = new HashMap<Integer, ParsedPredictionModel.VariableValue>();
+
+    VariableValue falseValue = new VariableValue(VARIABLE_TYPE_BINARY_FALSE, null);
+    parsedVariable.values.put(0, falseValue);
+    VariableValue trueValue = new VariableValue(VARIABLE_TYPE_BINARY_TRUE, null);
+    parsedVariable.values.put(1, trueValue);
+  
+    return parsedVariable;
+    
+  }
+  
 }

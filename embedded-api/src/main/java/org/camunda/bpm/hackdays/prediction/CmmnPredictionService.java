@@ -52,8 +52,8 @@ public class CmmnPredictionService {
 	 * 
 	 * @return
 	 */
-	public Map<String, Double> estimate(String modelName, String variableName, Map<String, Object> variableEvidence) {
-	  return new EstimateDistributionCmd(modelName, variableName, variableEvidence).execute(this);
+	public Map<String, Double> estimate(String modelName, String variableName, Map<String, Integer> variableAssignments, Map<String, Object> variableEvidence) {
+	  return new EstimateDistributionCmd(modelName, variableName, variableAssignments, variableEvidence).execute(this);
 	}
 	
 	public static CmmnPredictionService build(DataSource dataSource) {

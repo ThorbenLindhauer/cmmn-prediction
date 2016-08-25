@@ -1,13 +1,17 @@
 {
   "variables" : {
     "foo" : {
-      "type": "custom",
+      "type" : "custom",
       "categories" : [
         {"label" : "fooCat1", "expression" : "intVal < 100"},
         {"label" : "fooCat2", "expression" : "intVal >= 100"}
       ]
+    },
+    "PlanItem_1" : {
+      "type" : "binary"
     }
   },
   "dependencies" : {
+    "PlanItem_1" : ["foo"]
   }
 }

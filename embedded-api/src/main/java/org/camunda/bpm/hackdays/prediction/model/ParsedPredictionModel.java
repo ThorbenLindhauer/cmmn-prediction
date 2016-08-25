@@ -39,19 +39,26 @@ import de.odysseus.el.util.SimpleResolver;
 public class ParsedPredictionModel {
 
   protected String id;
+  protected Map<String, ExpressionBasedVariable> expressionBasedVariables;
+  protected Map<String, DiscreteVariable> binaryVariables;
   protected Map<String, DiscreteVariable> variables;
   protected Map<String, List<String>> dependencies;
   
   public ParsedPredictionModel(
       String id,
-      Map<String, DiscreteVariable> variables, 
+      Map<String, DiscreteVariable> binaryVariables,
+      Map<String, ExpressionBasedVariable> expressionBasedVariables,
       Map<String, List<String>> dependencies) {
     this.id = id;
-    this.variables = variables;
+    this.binaryVariables = binaryVariables;
+    this.expressionBasedVariables = expressionBasedVariables;
+    this.variables = new HashMap<String, ParsedPredictionModel.DiscreteVariable>();
+    this.variables.putAll(expressionBasedVariables);
+    this.variables.putAll(binaryVariables);
     this.dependencies = dependencies;
   }
-
-  public static class DiscreteVariable {
+  
+  public static class ExpressionBasedVariable extends DiscreteVariable {
     protected static final ELResolver EL_RESOLVER = new CompositeELResolver() {
       {
         add(new RootMapELResolver());
@@ -62,12 +69,11 @@ public class ParsedPredictionModel {
         add(new BeanELResolver(true));
       }
     };
-    
-    protected String name;
-    protected Map<Integer, VariableValue> values;
-    
-    public Integer determineValue(Map<String, Object> variables) {
-      // TODO: evaluate expressions here and return the one that matches
+
+    /**
+     * May return null if no matching value could be determined (e.g. because this variable does not support expressions)
+     */
+    public Integer determineExpressionValue(Map<String, Object> variables) {
       
       // TODO: cache factory and expressions
       ExpressionFactory expressionFactory = new ExpressionFactoryImpl();
@@ -77,8 +83,10 @@ public class ParsedPredictionModel {
       juelContext.putContext(Map.class, variables);
       
       for (Map.Entry<Integer, VariableValue> value : values.entrySet()) {
+        String expressionString = value.getValue().getExpression();
+        
         ValueExpression expression = 
-            expressionFactory.createValueExpression(new SimpleContext(), value.getValue().getExpression(), Boolean.class);
+            expressionFactory.createValueExpression(new SimpleContext(), expressionString, Boolean.class);
         Object expressionValue = expression.getValue(juelContext);
         
         if (!(expressionValue instanceof Boolean)) {
@@ -92,6 +100,14 @@ public class ParsedPredictionModel {
       
       throw new CmmnPredictionException("Could not determine value of variable " + name + ". No expression matched");
     }
+    
+  }
+
+  public static class DiscreteVariable {
+    
+    protected String name;
+    protected Map<Integer, VariableValue> values;
+
     
     public String getName() {
       return name;
@@ -125,6 +141,14 @@ public class ParsedPredictionModel {
   
   public Map<String, DiscreteVariable> getVariables() {
     return variables;
+  }
+  
+  public Map<String, ExpressionBasedVariable> getExpressionBasedVariables() {
+    return expressionBasedVariables;
+  }
+  
+  public Map<String, DiscreteVariable> getBinaryVariables() {
+    return binaryVariables;
   }
   
   public GraphicalModel<DiscreteFactor> toGraphicalModel(Collection<ConditionalDiscreteDistributionPrior> modelPriors) {
