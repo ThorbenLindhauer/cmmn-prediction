@@ -19,29 +19,25 @@ import com.github.thorbenlindhauer.variable.Scope;
 
 public class EstimateDistributionCmd implements Command<Map<String, Double>> {
 
-  protected String modelName;
+  protected PredictionModel model;
   protected String variableName;
   protected Map<String, Integer> variableAssignment;
   protected Map<String, Object> expressionContext;
   
-  public EstimateDistributionCmd(String modelName, String variableName, Map<String, Integer> variableAssignment, Map<String, Object> expressionContext) {
-    this.modelName = modelName;
+  public EstimateDistributionCmd(PredictionModel model, String variableName, Map<String, Integer> variableAssignment, Map<String, Object> expressionContext) {
+    this.model = model;
     this.variableName = variableName;
     this.expressionContext = expressionContext;
     this.variableAssignment = variableAssignment;
   }
 
   public Map<String, Double> execute(CmmnPredictionService predictionService) {
-    PredictionModel model = predictionService.getModel(modelName);
-    
-    if (model == null) {
-      throw new CmmnPredictionException("Model with name " + modelName + " does not exist");
-    }
     
     ParsedPredictionModel parsedModel = predictionService.parseModel(model);
+    
     DiscreteVariable variable = parsedModel.getVariables().get(variableName);
     if (variable == null) {
-      throw new CmmnPredictionException("Variable with name " + variableName + " not defined in model " + modelName);
+      throw new CmmnPredictionException("Variable with name " + variableName + " not defined in model " + model.getName());
     }
 
     GraphicalModel<DiscreteFactor> graphicalModel = 

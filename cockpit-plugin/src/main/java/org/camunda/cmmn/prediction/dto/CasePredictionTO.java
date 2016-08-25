@@ -6,7 +6,7 @@ package org.camunda.cmmn.prediction.dto;
 public class CasePredictionTO {
 
   private String activityId;
-  private String probability;
+  private Double probability;
 
 
   public String getActivityId() {
@@ -17,11 +17,11 @@ public class CasePredictionTO {
     this.activityId = activityId;
   }
 
-  public String getProbability() {
+  public Double getProbability() {
     return probability;
   }
 
-  public void setProbability(String probability) {
+  public void setProbability(Double probability) {
     this.probability = probability;
   }
 }

@@ -3,6 +3,7 @@ package org.camunda.bpm.hackdays.prediction;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -52,8 +53,8 @@ public class CmmnPredictionService {
 	 * 
 	 * @return
 	 */
-	public Map<String, Double> estimate(String modelName, String variableName, Map<String, Integer> variableAssignments, Map<String, Object> variableEvidence) {
-	  return new EstimateDistributionCmd(modelName, variableName, variableAssignments, variableEvidence).execute(this);
+	public Map<String, Double> estimate(PredictionModel model, String variableName, Map<String, Integer> variableAssignments, Map<String, Object> variableEvidence) {
+	  return new EstimateDistributionCmd(model, variableName, variableAssignments, variableEvidence).execute(this);
 	}
 	
 	public static CmmnPredictionService build(DataSource dataSource) {
