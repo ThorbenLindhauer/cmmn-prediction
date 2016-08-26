@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.camunda.bpm.application.PostDeploy;
+import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -17,6 +18,7 @@ import org.camunda.bpm.engine.task.Task;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@ProcessApplication
 public class ExampleProcessApplication extends ServletProcessApplication {
 
   

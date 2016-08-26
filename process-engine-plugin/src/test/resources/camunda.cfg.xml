@@ -43,6 +43,8 @@
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->
 
   <!-- engine plugin beans -->
-  <bean id="cmmnPredictionPlugin" class="org.camunda.bpm.hackdays.prediction.plugin.CmmnPredictionPlugin" />
+  <bean id="cmmnPredictionPlugin" class="org.camunda.bpm.hackdays.prediction.plugin.CmmnPredictionPlugin">
+    <property name="createTables" value="false" />
+  </bean>
 
 </beans>

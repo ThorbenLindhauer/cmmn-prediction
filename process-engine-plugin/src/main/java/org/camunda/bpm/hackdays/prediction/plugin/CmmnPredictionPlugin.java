@@ -12,6 +12,8 @@ import java.sql.SQLException;
 
 public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
 
+  protected boolean createTables = true;
+  
   protected CmmnPredictionService cmmnPredictionService;
 
   @Override
@@ -26,6 +28,10 @@ public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
   }
 
   public void postProcessEngineBuild(ProcessEngine processEngine) {
+    if (!createTables) {
+      return;
+    }
+    
     DataSource dataSource = processEngine.getProcessEngineConfiguration().getDataSource();
     Connection connection = null;
     try {
@@ -42,5 +48,9 @@ public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
         }
       }
     }
+  }
+  
+  public void setCreateTables(boolean createTables) {
+    this.createTables = createTables;
   }
 }

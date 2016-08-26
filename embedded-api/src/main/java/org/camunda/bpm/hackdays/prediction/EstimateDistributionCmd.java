@@ -57,10 +57,9 @@ public class EstimateDistributionCmd implements Command<Map<String, Double>> {
     int[] evidenceAssignment = new int[evidencenVariables.size()];
     
     int[] orderMapping = evidenceScope.createOrderMapping(evidencenVariables);
-    IndexMapper indexMapper = evidenceScope.getIndexCoder().getIndexMapper(orderMapping);
     
     for (int i = 0; i < evidencenVariables.size(); i++) {
-      int targetIndex = indexMapper.mapIndex(i);
+      int targetIndex = orderMapping[i];
       evidenceAssignment[targetIndex] = groundEvidence.get(evidencenVariables.get(i));
     }
     

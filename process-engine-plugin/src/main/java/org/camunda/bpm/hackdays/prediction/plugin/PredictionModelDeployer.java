@@ -27,6 +27,10 @@ public class PredictionModelDeployer implements Deployer {
 
     List<CaseDefinitionEntity> deployedCaseDefinitions = deployment.getDeployedArtifacts(CaseDefinitionEntity.class);
     
+    if (deployedCaseDefinitions == null) {
+      return;
+    }
+    
     for (CaseDefinitionEntity caseDefinition : deployedCaseDefinitions) {
       String predictionModelResourceName = caseDefinition.getResourceName() + ".json";
       ResourceEntity predictionModel = deployment.getResource(predictionModelResourceName);

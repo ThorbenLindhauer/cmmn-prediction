@@ -7,6 +7,9 @@
           <cmmn:requiredRule id="RequiredRule_0sg0fgq">
             <cmmn:condition id="Expression_1v6woge">${false}</cmmn:condition>
           </cmmn:requiredRule>
+          <cmmn:manualActivationRule id="ManualActivationRule_1k3has1">
+            <cmmn:condition id="Expression_05ctn5s">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
         </cmmn:itemControl>
       </cmmn:planItem>
       <cmmn:planItem id="PlanItem_0w7b4h6" definitionRef="HumanTask_0klw0jk">
@@ -14,6 +17,9 @@
           <cmmn:requiredRule id="RequiredRule_1c627ju">
             <cmmn:condition id="Expression_0w3p3ku">${false}</cmmn:condition>
           </cmmn:requiredRule>
+          <cmmn:manualActivationRule id="ManualActivationRule_1wiy9bq">
+            <cmmn:condition id="Expression_1jwqjn8">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
         </cmmn:itemControl>
       </cmmn:planItem>
       <cmmn:humanTask id="HumanTask_156ms49" name="Do Stuff" />
