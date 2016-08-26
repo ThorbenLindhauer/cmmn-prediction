@@ -28,7 +28,7 @@ public class CaseInstanceResource extends AbstractCockpitPluginResource {
   @Path("{caseInstance}/activate")
   public Response activate(@PathParam("caseInstance") String caseInstance) {
     CaseExecution caseExecution = getProcessEngine().getCaseService().createCaseExecutionQuery().activityId(caseInstance).singleResult();
-    getProcessEngine().getCaseService().withCaseExecution(caseExecution.getId()).manualStart();
+    getProcessEngine().getCaseService().withCaseExecution(caseInstance).manualStart();
     return Response.ok().build();
   }
 
