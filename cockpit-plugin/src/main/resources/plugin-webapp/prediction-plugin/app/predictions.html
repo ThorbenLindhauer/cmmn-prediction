@@ -9,7 +9,12 @@
         <tbody>
         <tr data-ng-repeat="prediction in predictions">
             <td>{{ prediction.activityId }}</td>
-            <td>{{ prediction.probability }}</td>
+            <td>
+                <div>
+                    <span class="emoji">{{ prediction.emoji }}</span>
+                    <span>{{ prediction.probability }}</span>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>
