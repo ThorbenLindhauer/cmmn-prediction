@@ -1,14 +1,19 @@
 <div>
-    <div class="form-group starter text-center">
-        <button class="btn btn-primary"
-                ng-click="closeCase()">Close!</button>
+    <div class="form-group control-row text-center">
+        <div class="col text-left">
+            <button class="btn btn-primary"
+                    ng-click="manualStart()">Manual Start!</button>
+        </div>
+        <div class="col rest-width">
+            <input type="text"
+                   id="activityID"
+                   ng-model="activityId"
+                   class="form-control">
+        </div>
     </div>
-    <div class="form-group starter text-center">
-        <input type="text"
-                id="activityID"
-               ng-model="activityId"
-               class="form-control">
-        <button class="btn btn-primary"
-                ng-click="manualStart()">ManualStart!</button>
+    
+    <div class="form-group control-row col text-center">
+        <button class="btn form-control btn-primary"
+                ng-click="closeCase()">Close!</button>
     </div>
 </div>
