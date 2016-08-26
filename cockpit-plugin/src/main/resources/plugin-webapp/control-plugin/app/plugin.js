@@ -1,11 +1,16 @@
 define(['angular'], function(angular) {
     var ngModule = angular.module('cockpit.plugin.control-plugin', []);
 
-    var CaseInteractionController = ["$scope", 'camAPI', "$http","Uri", function($scope, camAPI, $http,Uri) {
+    var CaseInteractionController = ["$scope", 'camAPI', "$http","Uri",'Notifications', function($scope, camAPI, $http,Uri,Notifications) {
 
         $scope.startCase = function() {
             $http.post(Uri.appUri("plugin://control-plugin/:engine/start/" + $scope.definition.id))
                 .success(function(data) {
+                    Notifications.addMessage({
+                        type:'success',
+                        status:'Success',
+                        message:'Instance started'
+                    });
                     $scope.caseInstance = data;
                 });
         };

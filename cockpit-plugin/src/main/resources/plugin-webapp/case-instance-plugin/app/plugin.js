@@ -1,19 +1,27 @@
 define(['angular'], function(angular) {
     var ngModule = angular.module('cockpit.plugin.case-instance-plugin', []);
 
-    var CaseInteractionController = ["$scope", 'camAPI', "$http","Uri", function($scope, camAPI, $http,Uri) {
+    var CaseInteractionController = ["$scope", 'camAPI', "$http","Uri",'Notifications', function($scope, camAPI, $http,Uri,Notifications) {
 
         $scope.closeCase = function() {
             $http.post(Uri.appUri("plugin://case-instance-plugin/:engine/caseInstanceControl/" + $scope.instance.id + "/close"))
                 .success(function(data) {
-                    console.log("closed");
+                    Notifications.addMessage({
+                        type:'success',
+                        status:'Success',
+                        message:'Instance closed'
+                    });
                 });
         };
 
         $scope.manualStart = function() {
             $http.post(Uri.appUri("plugin://case-instance-plugin/:engine/caseInstanceControl/" + $scope.activityId + "/activate"))
                 .success(function(data) {
-                    console.log("started manually");
+                    Notifications.addMessage({
+                        type:'success',
+                        status:'Success',
+                        message:'Started manually'
+                    });
                 });
         };
 
