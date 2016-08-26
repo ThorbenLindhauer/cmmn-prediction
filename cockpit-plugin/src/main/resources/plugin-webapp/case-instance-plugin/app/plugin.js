@@ -11,7 +11,7 @@ define(['angular'], function(angular) {
         };
 
         $scope.manualStart = function() {
-            $http.post(Uri.appUri("plugin://case-instance-plugin/:engine/caseInstanceControl/" + $scope.instance.id + "/activate"))
+            $http.post(Uri.appUri("plugin://case-instance-plugin/:engine/caseInstanceControl/" + $scope.activityId + "/activate"))
                 .success(function(data) {
                     console.log("started manually");
                 });

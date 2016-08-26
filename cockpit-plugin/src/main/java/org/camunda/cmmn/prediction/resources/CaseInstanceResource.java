@@ -2,6 +2,7 @@ package org.camunda.cmmn.prediction.resources;
 
 import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginResource;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseExecutionDto;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,7 +27,8 @@ public class CaseInstanceResource extends AbstractCockpitPluginResource {
   @POST
   @Path("{caseInstance}/activate")
   public Response activate(@PathParam("caseInstance") String caseInstance) {
-    getProcessEngine().getCaseService().withCaseExecution(caseInstance).manualStart();
+    CaseExecution caseExecution = getProcessEngine().getCaseService().createCaseExecutionQuery().activityId(caseInstance).singleResult();
+    getProcessEngine().getCaseService().withCaseExecution(caseExecution.getId()).manualStart();
     return Response.ok().build();
   }
 
