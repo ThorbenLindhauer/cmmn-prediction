@@ -3,12 +3,12 @@ define(['angular'], function(angular) {
 
     var CaseInteractionController = ["$scope", 'camAPI', "$http","Uri", function($scope, camAPI, $http,Uri) {
         var eMap = {
-            0: '😢',
-            1: '😏',
-            2: '😔',
-            3: '😌',
-            4: '😁',
-            5: '😁'
+            0: '\ud83d\ude22',
+            1: '\ud83d\ude1e',
+            2: '\ud83d\ude14',
+            3: '\ud83d\ude0a',
+            4: '\ud83d\ude03',
+            5: '\ud83d\ude03'
         };
         $scope.mapEmoji = function (p) {
             return eMap[Math.floor(p.probability * 100/20)];

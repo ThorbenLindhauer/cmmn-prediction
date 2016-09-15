@@ -13,6 +13,17 @@ define(['angular'], function(angular) {
                     });
                 });
         };
+        
+        $scope.completeCase = function() {
+            $http.post(Uri.appUri("plugin://case-instance-plugin/:engine/caseInstanceControl/" + $scope.instance.id + "/complete"))
+                .success(function(data) {
+                    Notifications.addMessage({
+                        type:'success',
+                        status:'Success',
+                        message:'Instance completed'
+                    });
+                });
+        };
 
         $scope.manualStart = function() {
             $http.post(Uri.appUri("plugin://case-instance-plugin/:engine/caseInstanceControl/" + $scope.activityId + "/activate"))
@@ -31,9 +42,9 @@ define(['angular'], function(angular) {
 
         ViewsProvider.registerDefaultView('cockpit.caseInstance.tab', {
             id: 'cmmn-instance-control',
-            label: 'CMMN Instance Conrol',
+            label: 'CMMN Instance Control',
             url: 'plugin://case-instance-plugin/static/app/control.html',
-            dashboardMenuLabel: 'CMMN Instance Conrol',
+            dashboardMenuLabel: 'CMMN Instance Control',
             controller: CaseInteractionController,
 
 

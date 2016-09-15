@@ -23,6 +23,13 @@ public class CaseInstanceResource extends AbstractCockpitPluginResource {
     getProcessEngine().getCaseService().withCaseExecution(caseInstance).close();
     return Response.ok().build();
   }
+  
+  @POST
+  @Path("{caseInstance}/complete")
+  public Response completeInstance(@PathParam("caseInstance") String caseInstance) {
+    getProcessEngine().getCaseService().withCaseExecution(caseInstance).complete();
+    return Response.ok().build();
+  }
 
   @POST
   @Path("{caseInstance}/activate")

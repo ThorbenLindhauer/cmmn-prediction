@@ -3,7 +3,7 @@
         <thead>
         <tr>
             <th>Case Activity</th>
-            <th>Probablity</th>
+            <th>Probability</th>
         </tr>
         </thead>
         <tbody>
@@ -12,7 +12,7 @@
             <td>
                 <div>
                     <span class="emoji">{{ prediction.emoji }}</span>
-                    <span>{{ prediction.probability }}</span>
+                    <span>{{ prediction.probability * 100 | number :1 }} %</span>
                 </div>
             </td>
         </tr>

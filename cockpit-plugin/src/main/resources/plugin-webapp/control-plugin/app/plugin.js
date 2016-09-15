@@ -21,9 +21,9 @@ define(['angular'], function(angular) {
 
         ViewsProvider.registerDefaultView('cockpit.caseDefinition.tab', {
             id: 'cmmn-control',
-            label: 'CMMN Conrol',
+            label: 'CMMN Control',
             url: 'plugin://control-plugin/static/app/starter.html',
-            dashboardMenuLabel: 'CMMN Conrol',
+            dashboardMenuLabel: 'CMMN Control',
             controller: CaseInteractionController,
 
 
