@@ -122,4 +122,9 @@ public class EndToEndTest {
     
     assertThat(probabilityPerformActivityGivenValue).isGreaterThan(probabilityPerformActivity);
   }
+  
+  @Test
+  public void shouldObtainPredictionService() {
+    assertThat(CmmnPredictionPlugin.getPredictionService(engineRule.getProcessEngine())).isNotNull();
+  }
 }

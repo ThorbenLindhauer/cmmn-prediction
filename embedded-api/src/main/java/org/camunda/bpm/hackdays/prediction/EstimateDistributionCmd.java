@@ -14,7 +14,6 @@ import com.github.thorbenlindhauer.factor.DiscreteFactor;
 import com.github.thorbenlindhauer.inference.VariableEliminationInferencer;
 import com.github.thorbenlindhauer.inference.variableelimination.MinFillEliminationStrategy;
 import com.github.thorbenlindhauer.network.GraphicalModel;
-import com.github.thorbenlindhauer.variable.IndexMapper;
 import com.github.thorbenlindhauer.variable.Scope;
 
 public class EstimateDistributionCmd implements Command<Map<String, Double>> {

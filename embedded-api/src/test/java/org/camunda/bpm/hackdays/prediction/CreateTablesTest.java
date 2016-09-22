@@ -8,8 +8,6 @@ import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

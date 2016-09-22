@@ -8,28 +8,11 @@ import javax.sql.DataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 
 public class PredictionTestRule extends TestWatcher {
 
   protected PooledDataSource dataSource;
   protected CmmnPredictionService predictionService;
-  
-  
-//  @Override
-//  public Statement apply(final Statement base, final Description description) {
-//    return new Statement() {
-//      
-//      @Override
-//      public void evaluate() throws Throwable {
-//        prepare();
-//        
-//        PredictionTestRule.super.apply(base, description);
-//        cleanUp();
-//        
-//      }
-//    };
-//  }
   
   @Override
   protected void starting(Description description) {

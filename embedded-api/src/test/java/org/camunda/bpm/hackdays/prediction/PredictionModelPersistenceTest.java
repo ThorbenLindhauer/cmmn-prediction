@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,28 +26,6 @@ public class PredictionModelPersistenceTest {
     predictionService = rule.getPredictionService();
   }
   
-//  @Before
-//  public void setUp() throws SQLException
-//  {
-//
-//    PooledDataSource pooledDataSource = new PooledDataSource(
-//          PredictionModelPersistenceTest.class.getClassLoader(), 
-//          "org.h2.Driver", 
-//          "jdbc:h2:mem:foo", 
-//          "", 
-//          "");
-//     
-//    predictionService = CmmnPredictionService.build(pooledDataSource);
-//    
-//    predictionService.createDbTables(pooledDataSource.getConnection());
-//    pooledDataSource.getConnection().close();
-//  }
-//  
-//  @After
-//  public void tearDown() {
-//    
-//  }
-//  
   @Test
   public void shouldPersistModel() {
     // given
@@ -74,7 +51,7 @@ public class PredictionModelPersistenceTest {
     PredictionModel model = new PredictionModel();
     model.setId("1");
     model.setName("foo");
-    model.setResource(IoUtil.readInputStream(PredictionModelPrior.class.getClassLoader().getResourceAsStream("model.json"), "model"));
+    model.setResource(IoUtil.readInputStream(PredictionModelPrior.class.getClassLoader().getResourceAsStream("model.json")));
     
     ParsedPredictionModel parsedPredictionModel = predictionService.parseModel(model);
     model.setPriors(parsedPredictionModel.generateRawPriors());
@@ -104,7 +81,7 @@ public class PredictionModelPersistenceTest {
     PredictionModel model = new PredictionModel();
     model.setId("1");
     model.setName("foo");
-    model.setResource(IoUtil.readInputStream(PredictionModelPrior.class.getClassLoader().getResourceAsStream("model.json"), "model"));
+    model.setResource(IoUtil.readInputStream(PredictionModelPrior.class.getClassLoader().getResourceAsStream("model.json")));
     
     ParsedPredictionModel parsedPredictionModel = predictionService.parseModel(model);
     model.setPriors(parsedPredictionModel.generateRawPriors());

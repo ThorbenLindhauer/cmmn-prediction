@@ -1,14 +1,17 @@
 package org.camunda.bpm.hackdays.prediction.plugin;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.camunda.commons.utils.EnsureUtil;
 
 public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
 
@@ -52,5 +55,26 @@ public class CmmnPredictionPlugin extends AbstractProcessEnginePlugin {
   
   public void setCreateTables(boolean createTables) {
     this.createTables = createTables;
+  }
+  
+  public CmmnPredictionService getCmmnPredictionService() {
+    return cmmnPredictionService;
+  }
+  
+  /**
+   * For a process engine that has this plugin registered, fetches the managed {@link CmmnPredictionService}.
+   */
+  public static CmmnPredictionService getPredictionService(ProcessEngine processEngine) {
+    EnsureUtil.ensureNotNull("processEngine", processEngine);
+    
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    
+    for (ProcessEnginePlugin enginePlugin : engineConfiguration.getProcessEnginePlugins()) {
+      if (enginePlugin instanceof CmmnPredictionPlugin) {
+        return ((CmmnPredictionPlugin) enginePlugin).getCmmnPredictionService();
+      }
+    }
+    
+    throw new RuntimeException("Could not fetch CmmnPredictionService. CmmnPredictionPlugin not registerd with engine " + processEngine.getName());
   }
 }

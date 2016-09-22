@@ -34,7 +34,6 @@ import com.github.thorbenlindhauer.variable.Scope;
 
 import de.odysseus.el.ExpressionFactoryImpl;
 import de.odysseus.el.util.SimpleContext;
-import de.odysseus.el.util.SimpleResolver;
 
 public class ParsedPredictionModel {
 

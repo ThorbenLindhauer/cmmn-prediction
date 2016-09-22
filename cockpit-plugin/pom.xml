@@ -16,11 +16,17 @@
   </parent>
   
   <dependencies>
-
     <dependency>
       <groupId>org.camunda.bpm.hackdays</groupId>
       <artifactId>embedded-api</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.hackdays</groupId>
+      <artifactId>process-engine-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

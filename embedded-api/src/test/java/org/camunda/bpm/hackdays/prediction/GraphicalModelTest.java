@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,7 +34,7 @@ public class GraphicalModelTest {
     PredictionModel model = new PredictionModel();
     model.setId("1");
     model.setName("foo");
-    model.setResource(IoUtil.readInputStream(PredictionModelPrior.class.getClassLoader().getResourceAsStream("model.json"), "model"));
+    model.setResource(IoUtil.readInputStream(PredictionModelPrior.class.getClassLoader().getResourceAsStream("model.json")));
     
     ParsedPredictionModel parsedPredictionModel = predictionService.parseModel(model);
     

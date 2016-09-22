@@ -25,6 +25,7 @@ public class RootMapELResolver extends ELResolver {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Object getValue(ELContext context, Object base, Object property) {
     Map<String, Object> map = (Map<String, Object>) context.getContext(Map.class);
     

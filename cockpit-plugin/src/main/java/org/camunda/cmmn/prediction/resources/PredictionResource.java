@@ -7,26 +7,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginResource;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.CaseExecution;
-import org.camunda.bpm.hackdays.prediction.CmmnPredictionException;
 import org.camunda.bpm.hackdays.prediction.CmmnPredictionService;
 import org.camunda.bpm.hackdays.prediction.PredictionModel;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 import org.camunda.bpm.hackdays.prediction.model.PredictionModelParser;
+import org.camunda.bpm.hackdays.prediction.plugin.CmmnPredictionPlugin;
 import org.camunda.cmmn.prediction.dto.CasePredictionTO;
 
 /**
  * @author Askar Akhmerov
  */
 public class PredictionResource extends AbstractCockpitPluginResource {
-  private static CmmnPredictionService predictionService;
 
   public PredictionResource(String engineName) {
     super(engineName);
@@ -40,8 +39,12 @@ public class PredictionResource extends AbstractCockpitPluginResource {
   }
 
   protected List<CasePredictionTO> queryPredictions(String caseInstanceId) {
+    ProcessEngine processEngine = getProcessEngine();
+    CaseService caseService = processEngine.getCaseService();
+
+    CmmnPredictionService predictionService = getPredictionService();
+    
     List<CasePredictionTO> result = new ArrayList<CasePredictionTO>();
-    CaseService caseService = getProcessEngine().getCaseService();
     
     Map<String, Object> variables = caseService.getVariables(caseInstanceId);
     String caseDefinitionId = caseService.createCaseExecutionQuery()
@@ -58,13 +61,14 @@ public class PredictionResource extends AbstractCockpitPluginResource {
       planItemIds.add(execution.getActivityId());
     }
     
-    PredictionModel model = this.getPredictionService().getModel(caseDefinitionId);
+    
+    PredictionModel model = predictionService.getModel(caseDefinitionId);
     
     if (model == null) {
       throw new RuntimeException("Model with name " + caseDefinitionId + " does not exist");
     }
     
-    ParsedPredictionModel parsedModel = this.getPredictionService().parseModel(model);
+    ParsedPredictionModel parsedModel = predictionService.parseModel(model);
     
     for (String planItemId : planItemIds) {
       if (!parsedModel.getVariables().containsKey(planItemId)) {
@@ -72,7 +76,7 @@ public class PredictionResource extends AbstractCockpitPluginResource {
         continue;
       }
       
-      Map<String, Double> estimations = this.getPredictionService().estimate(model, planItemId, new HashMap<String, Integer>(), variables);
+      Map<String, Double> estimations = predictionService.estimate(model, planItemId, new HashMap<String, Integer>(), variables);
 
       CasePredictionTO toAdd = new CasePredictionTO();
       toAdd.setActivityId(planItemId);
@@ -84,11 +88,7 @@ public class PredictionResource extends AbstractCockpitPluginResource {
   }
 
   protected CmmnPredictionService getPredictionService() {
-    if (predictionService == null) {
-      DataSource dataSource = this.getProcessEngine().getProcessEngineConfiguration().getDataSource();
-      predictionService = CmmnPredictionService.build(dataSource);
-    }
-    return predictionService;
+    return CmmnPredictionPlugin.getPredictionService(getProcessEngine());
   }
 }
  
