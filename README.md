@@ -1,6 +1,3 @@
-TODO:
-* h2 only
-
 # Camunda CMMN Prediction
 
 This project extends the Camunda CMMN engine by capabilites to make predictions over case instance variables and case instance activity execution. It can be used for recommending tasks to case workers in the context of a case instance. Probability distributions are learned over time whenever a case instance is closed. The formalism used is [Bayesian Networks](https://en.wikipedia.org/wiki/Bayesian_network) with multinomial distributions (aka table-based distributions).
@@ -31,6 +28,7 @@ Have a look at the `example-application` module for a process application that d
 
 * Java 6 or higher should work to run this extension
 * Java 8 for building the project from source
+* This extension creates custom database tables and currently supports H2 only
 
 
 ### Developing a Prediction Model

@@ -27,17 +27,17 @@ public class CmmnPredictionService {
   protected CmmnPredictionService() {
   }
   
-	public void createDbTables() {
-	  inTransactionDo(new ConnectionFunction() {
+  public void createDbTables() {
+    inTransactionDo(new ConnectionFunction() {
 
       public void call(Connection connection) {
         new CreateTablesCmd(connection).execute(CmmnPredictionService.this);
       }
     });
-	}
-	
-	protected void inTransactionDo(ConnectionFunction callable) {
-	  Transaction transaction = null;
+  }
+  
+  protected void inTransactionDo(ConnectionFunction callable) {
+    Transaction transaction = null;
     
     try {
       transaction = txFactory.newTransaction(dataSource, null, false);
@@ -62,52 +62,52 @@ public class CmmnPredictionService {
         }
       }
     }
-	}
-	
-	protected static interface ConnectionFunction {
-	  void call(Connection connection);
-	}
-	
-	public void dropDbTables() {
-	  inTransactionDo(new ConnectionFunction() {
+  }
+  
+  protected static interface ConnectionFunction {
+    void call(Connection connection);
+  }
+  
+  public void dropDbTables() {
+    inTransactionDo(new ConnectionFunction() {
 
       public void call(Connection connection) {
         new DropTablesCmd(connection).execute(CmmnPredictionService.this);
       }
     });
-	}
-	
-	public PredictionModel getModel(String name) {
-	  return new GetModelCmd(name).execute(this);
-	}
-	
-	public void insertModel(PredictionModel model) {
-	  new CreateModelCmd(model).execute(this);
-	}
-	
-	public void updateModel(PredictionModel model) {
-	  new UpdateModelCmd(model).execute(this);
-	}
-	
-	public ParsedPredictionModel parseModel(PredictionModel model) {
-	  return new ParseModelCmd(model).execute(this);
-	}
-	
-	/**
-	 * For the given variable, estimate the marginal probability.
-	 * 
-	 * @return
-	 */
-	public Map<String, Double> estimate(PredictionModel model, String variableName, Map<String, Integer> variableAssignments, Map<String, Object> expressionContext) {
-	  return new EstimateDistributionCmd(model, variableName, variableAssignments, expressionContext).execute(this);
-	}
-	
-	public static CmmnPredictionService buildStandalone(DataSource dataSource) {
-	  return buildWithTxFactory(dataSource, new JdbcTransactionFactory());
-	}
-	
-	public static CmmnPredictionService buildWithTxFactory(DataSource dataSource, TransactionFactory txFactory) {
-	  InputStream config = CmmnPredictionService.class.getClassLoader().getResourceAsStream("mybatis/mybatis-config.xml");
+  }
+  
+  public PredictionModel getModel(String name) {
+    return new GetModelCmd(name).execute(this);
+  }
+  
+  public void insertModel(PredictionModel model) {
+    new CreateModelCmd(model).execute(this);
+  }
+  
+  public void updateModel(PredictionModel model) {
+    new UpdateModelCmd(model).execute(this);
+  }
+  
+  public ParsedPredictionModel parseModel(PredictionModel model) {
+    return new ParseModelCmd(model).execute(this);
+  }
+  
+  /**
+   * For the given variable, estimate the marginal probability.
+   * 
+   * @return
+   */
+  public Map<String, Double> estimate(PredictionModel model, String variableName, Map<String, Integer> variableAssignments, Map<String, Object> expressionContext) {
+    return new EstimateDistributionCmd(model, variableName, variableAssignments, expressionContext).execute(this);
+  }
+  
+  public static CmmnPredictionService buildStandalone(DataSource dataSource) {
+    return buildWithTxFactory(dataSource, new JdbcTransactionFactory());
+  }
+  
+  public static CmmnPredictionService buildWithTxFactory(DataSource dataSource, TransactionFactory txFactory) {
+    InputStream config = CmmnPredictionService.class.getClassLoader().getResourceAsStream("mybatis/mybatis-config.xml");
     SqlSessionFactory sqlSessionFactory = createMyBatisSqlSessionFactory(config, dataSource, txFactory);
     
     CmmnPredictionService service = new CmmnPredictionService();
@@ -115,9 +115,9 @@ public class CmmnPredictionService {
     service.dataSource = dataSource;
     service.txFactory = txFactory;
     return service;
-	}
-	
-	protected static SqlSessionFactory createMyBatisSqlSessionFactory(InputStream config, DataSource dataSource, TransactionFactory txFactory) {
+  }
+  
+  protected static SqlSessionFactory createMyBatisSqlSessionFactory(InputStream config, DataSource dataSource, TransactionFactory txFactory) {
 
     Environment environment = new Environment("cmmn-prediction", txFactory, dataSource);
 
@@ -129,5 +129,5 @@ public class CmmnPredictionService {
 
     SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
     return sqlSessionFactory;
-	}
+  }
 }
