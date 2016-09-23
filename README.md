@@ -1,3 +1,6 @@
+TODO:
+* h2 only
+
 # Camunda CMMN Prediction
 
 This project extends the Camunda CMMN engine by capabilites to make predictions over case instance variables and case instance activity execution. It can be used for recommending tasks to case workers in the context of a case instance. Probability distributions are learned over time whenever a case instance is closed. The formalism used is [Bayesian Networks](https://en.wikipedia.org/wiki/Bayesian_network) with multinomial distributions (aka table-based distributions).
@@ -132,14 +135,31 @@ Map<String, Double> probabilities = predictionService.estimate(model, targetVari
 
 ## How It Works
 
-Bayesian networks describe a probability distribution over all network variables and how this distribution factorizes. In our example CMMN case, we describe the joint distribution `P(PlanItem_Estimate_Value, PlanItem_Test_Drive, price, boot_size, doors)`. The dependencies encode that this distribution factorizes as `P(PlanItem_Estimate_Value, PlanItem_Test_Drive, price, boot_size, doors) = P(PlanItem_Estimate_Value | price) * P(PlanItem_Test_Drive | boot_size, doors) * P(price | boot_size) * P(boot_size) * P(doors)`. Assuming we know the family and parameters of these distributions, we can compute marginal probabilities like `P(PlanItem_Estimate_Value = true)` or `P(PlanItem_Estimate_Value = true | boot_size = 'large')`. These kinds of computations, called *inference*, are implemented in the [graphical-models](https://github.com/ThorbenLindhauer/graphical-models) library that this extension is based on.
+Bayesian networks describe a probability distribution over all network variables and how this distribution factorizes. In our example CMMN case, we describe the following joint distribution:
+
+```
+P(PlanItem_Estimate_Value, PlanItem_Test_Drive, price, boot_size, doors)
+```
+
+The dependencies encode that this distribution factorizes as:
+
+```
+P(PlanItem_Estimate_Value, PlanItem_Test_Drive, price, boot_size, doors) =
+    P(PlanItem_Estimate_Value | price)
+    * P(PlanItem_Test_Drive | boot_size, doors)
+    * P(price | boot_size)
+    * P(boot_size)
+    * P(doors)
+```
+
+Assuming we know the family and parameters of these distributions, we can compute marginal probabilities like `P(PlanItem_Estimate_Value = true)` or `P(PlanItem_Estimate_Value = true | boot_size = 'large')`. These kinds of computations, called *inference*, are implemented in the [graphical-models](https://github.com/ThorbenLindhauer/graphical-models) library that this extension is based on.
 
 In this application of Bayesian networks, we choose the involved distributions to be [multinomial](https://en.wikipedia.org/wiki/Multinomial_distribution), i.e. discrete distributions that describe a repeated expirement with `n` different outcomes. We can learn the parameters of the individual distributions that the joint distribution factorizes to. Since we don't know these parameters for sure, we can define another distribution over the parameters. For multinomial distributions, this distribution is typically a [Dirichlet distribution](https://en.wikipedia.org/wiki/Dirichlet_distribution) due to its nice computational properties. A Dirichlet has parameters itself and these can be interpreted as how often each outcome of the multinomial was previously observed. When making a prediction, we choose a single set of multinomial parameters by taking the Dirichlet's expectation. Whenever a case instance finishes, we update the Dirichlet's parameters according to the observed outcomes. The current implementation requires that all variables must be observed. Again, this learning component is part of the graphical-models library.
 
 
 ## What Is Possible But Not Implemented?
 
-* Providing **prior distributions** along with the bayesian network. A prior encodes the belief about probability distributions before seeing any data. For example, if a domain expert knows under which circumstances an activity is typically performed, this can be encoded in the deployed model and the predictions become more accurate in the beginning with little observed case instance.
+* Providing **prior distributions** along with the bayesian network. A prior encodes the belief about probability distributions before seeing any data. For example, if a domain expert knows under which circumstances an activity is typically performed, this can be encoded in the deployed model and the predictions become more accurate in the beginning with only few observed case instances.
 * **Hybrid networks** of multinomial distributions and conditional linear Gaussian distributions (i.e. Gaussian distributions linearly dependent on other Gaussian or multinomial distributed variables). Haven't looked into the math yet ;)
 * **Learning with incomplete observations**, i.e. where not all variables in a case instance have been observed.
 * **Learning the structure of the network** from case instance data.

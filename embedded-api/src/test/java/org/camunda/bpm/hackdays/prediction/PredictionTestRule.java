@@ -23,43 +23,14 @@ public class PredictionTestRule extends TestWatcher {
         "", 
         "");
    
-    predictionService = CmmnPredictionService.build(dataSource);
-    
-    Connection connection = null;
-    try {
-      connection = dataSource.getConnection();
-      predictionService.createDbTables(connection);
-    } catch (Exception e) {
-      throw new RuntimeException("Could not create tables", e);
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          throw new RuntimeException("could not close connection", e);
-        }
-      }
-    }
+    predictionService = CmmnPredictionService.buildStandalone(dataSource);
+    predictionService.createDbTables();
   }
 
   @Override
   protected void finished(Description description) {
 
-    Connection connection = null;
-    try {
-      connection = dataSource.getConnection();
-      predictionService.dropDbTables(connection);
-    } catch (Exception e) {
-      throw new RuntimeException("Could not create tables", e);
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          throw new RuntimeException("could not close connection", e);
-        }
-      }
-    }
+    predictionService.dropDbTables();
     
     dataSource.forceCloseAll();
   }

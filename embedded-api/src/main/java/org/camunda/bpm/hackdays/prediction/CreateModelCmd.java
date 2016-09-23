@@ -22,6 +22,8 @@ public class CreateModelCmd implements Command<Void> {
         }
       }
       
+      sqlSession.commit();
+      
     } finally {
       sqlSession.close();
     }

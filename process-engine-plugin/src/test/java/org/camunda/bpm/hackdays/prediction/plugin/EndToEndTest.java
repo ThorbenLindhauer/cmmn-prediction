@@ -4,10 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -54,10 +60,10 @@ public class EndToEndTest {
   public void shouldEstimateModelVariable() {
     // given
     deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("twoTasksCase.cmmn")
-      .addInputStream("twoTasksCase.cmmn.json", EndToEndTest.class.getClassLoader().getResourceAsStream("model.json"))
-      .deploy()
-      .getId();
+        .addClasspathResource("twoTasksCase.cmmn")
+        .addInputStream("twoTasksCase.cmmn.json", EndToEndTest.class.getClassLoader().getResourceAsStream("model.json"))
+        .deploy()
+        .getId();
     
     CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
     
@@ -126,5 +132,40 @@ public class EndToEndTest {
   @Test
   public void shouldObtainPredictionService() {
     assertThat(CmmnPredictionPlugin.getPredictionService(engineRule.getProcessEngine())).isNotNull();
+  }
+  
+  @Test
+  public void shouldParticipateInEngineTransaction() {
+    // given
+    ProcessEngineConfigurationImpl engineConfiguration = engineRule.getProcessEngineConfiguration();
+    
+    // when
+    final AtomicReference<String> caseDefinitionId = new AtomicReference<String>();
+    
+    try {
+      engineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+        
+        public Void execute(CommandContext commandContext) {
+          commandContext.getProcessEngineConfiguration().getRepositoryService().createDeployment()
+            .addClasspathResource("twoTasksCase.cmmn")
+            .addInputStream("twoTasksCase.cmmn.json", EndToEndTest.class.getClassLoader().getResourceAsStream("model-with-binary-var.json"))
+            .deploy();
+          
+          List<CaseDefinitionEntity> caseDefinitions = 
+              commandContext.getDbEntityManager().getDbEntityCache().getEntitiesByType(CaseDefinitionEntity.class);
+          
+          CaseDefinitionEntity caseDefinition = caseDefinitions.get(0);
+          caseDefinitionId.set(caseDefinition.getId());
+          
+          throw new RuntimeException("Make deployment fail");
+        }
+      });
+    } catch (RuntimeException e) {
+      // ignore our own exception
+    }
+    
+    // then
+    PredictionModel model = predictionService.getModel(caseDefinitionId.get());
+    assertThat(model).isNull();
   }
 }

@@ -20,6 +20,8 @@ public class UpdateModelCmd implements Command<Void> {
       for (PredictionModelPrior prior : model.getPriors()) {
         sqlSession.update("PredictionModelPrior.update", prior);
       }
+      
+      sqlSession.commit();
     } finally {
       sqlSession.close();
     }

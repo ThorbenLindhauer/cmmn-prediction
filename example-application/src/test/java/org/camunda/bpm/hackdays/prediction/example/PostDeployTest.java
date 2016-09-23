@@ -29,7 +29,7 @@ public class PostDeployTest {
   
   @Before
   public void initPredictionService() {
-    predictionService = CmmnPredictionService.build(engineRule.getProcessEngineConfiguration().getDataSource());
+    predictionService = CmmnPredictionService.buildStandalone(engineRule.getProcessEngineConfiguration().getDataSource());
   }
   
   @After

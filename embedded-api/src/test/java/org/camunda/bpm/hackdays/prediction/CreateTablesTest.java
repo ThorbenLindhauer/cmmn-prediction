@@ -3,43 +3,38 @@ package org.camunda.bpm.hackdays.prediction;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
+import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class CreateTablesTest {
 
-  protected Connection connection;
+  protected DataSource dataSource;
   
   @Before
   public void setUp() throws Exception {
-    Class.forName("org.h2.Driver");
-    connection = DriverManager.getConnection("jdbc:h2:mem:foo");
+//    Class.forName("org.h2.Driver");
+    dataSource = new PooledDataSource("org.h2.Driver", "jdbc:h2:mem:foo", null);
+//    connection = DriverManager.getConnection("jdbc:h2:mem:foo");
   }
   
-  @After
-  public void tearDown() throws Exception
-  {
-    if (connection != null) {
-      connection.close();
-    }
-  }
-
   @Test
   public void shouldCreateTables() throws Exception {
     // given
-    CmmnPredictionService service = new CmmnPredictionService();
+    CmmnPredictionService service = CmmnPredictionService.buildStandalone(dataSource);
     
     // when
-    service.createDbTables(connection);
+    service.createDbTables();
     
     // then
-    ResultSet resultSet = connection.createStatement().executeQuery("SHOW TABLES");
+    ResultSet resultSet = dataSource.getConnection().createStatement().executeQuery("SHOW TABLES");
     Set<String> tableNames = new HashSet<String>();
     
     while (resultSet.next())

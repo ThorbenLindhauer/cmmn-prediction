@@ -3,6 +3,7 @@ package org.camunda.bpm.hackdays.prediction;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -12,23 +13,68 @@ import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 
 public class CmmnPredictionService {
   
   protected DataSource dataSource;
   protected SqlSessionFactory sqlSessionFactory;
+  protected TransactionFactory txFactory;
+  
+  protected CmmnPredictionService() {
+  }
+  
+	public void createDbTables() {
+	  inTransactionDo(new ConnectionFunction() {
 
-  // TODO: perhaps this should internally get a connection from datasource
-  //   to be consistent with other APIs
-	public void createDbTables(Connection dbConnection) {
-		new CreateTablesCmd(dbConnection).execute(this);
+      public void call(Connection connection) {
+        new CreateTablesCmd(connection).execute(CmmnPredictionService.this);
+      }
+    });
 	}
 	
-	public void dropDbTables(Connection dbConnection) {
-	  new DropTablesCmd(dbConnection).execute(this);
+	protected void inTransactionDo(ConnectionFunction callable) {
+	  Transaction transaction = null;
+    
+    try {
+      transaction = txFactory.newTransaction(dataSource, null, false);
+      callable.call(transaction.getConnection());
+      
+      transaction.commit();
+    } catch (Exception e) {
+      if (transaction != null) {
+        try {
+          transaction.rollback();
+        } catch (SQLException e1) {
+          throw new RuntimeException("Could not rollback tx", e);
+        }
+      }
+    }
+    finally {
+      if (transaction != null) {
+        try {
+          transaction.close();
+        } catch (SQLException e) {
+          throw new RuntimeException("Could not close tx", e);
+        }
+      }
+    }
+	}
+	
+	protected static interface ConnectionFunction {
+	  void call(Connection connection);
+	}
+	
+	public void dropDbTables() {
+	  inTransactionDo(new ConnectionFunction() {
+
+      public void call(Connection connection) {
+        new DropTablesCmd(connection).execute(CmmnPredictionService.this);
+      }
+    });
 	}
 	
 	public PredictionModel getModel(String name) {
@@ -56,27 +102,24 @@ public class CmmnPredictionService {
 	  return new EstimateDistributionCmd(model, variableName, variableAssignments, expressionContext).execute(this);
 	}
 	
-	public static CmmnPredictionService build(DataSource dataSource) {
-	  InputStream config = CmmnPredictionService.class.getClassLoader().getResourceAsStream("mybatis/mybatis-config.xml");
-	  SqlSessionFactory sqlSessionFactory = createMyBatisSqlSessionFactory(config, dataSource);
-	  
-	  CmmnPredictionService service = new CmmnPredictionService();
-	  service.sqlSessionFactory = sqlSessionFactory;
-	  service.dataSource = dataSource;
-	  return service;
+	public static CmmnPredictionService buildStandalone(DataSource dataSource) {
+	  return buildWithTxFactory(dataSource, new JdbcTransactionFactory());
 	}
 	
-	protected static SqlSessionFactory createMyBatisSqlSessionFactory(InputStream config, DataSource dataSource) {
-    // use this transaction factory if you work in a non transactional
-    // environment
-    // TransactionFactory transactionFactory = new JdbcTransactionFactory();
+	public static CmmnPredictionService buildWithTxFactory(DataSource dataSource, TransactionFactory txFactory) {
+	  InputStream config = CmmnPredictionService.class.getClassLoader().getResourceAsStream("mybatis/mybatis-config.xml");
+    SqlSessionFactory sqlSessionFactory = createMyBatisSqlSessionFactory(config, dataSource, txFactory);
+    
+    CmmnPredictionService service = new CmmnPredictionService();
+    service.sqlSessionFactory = sqlSessionFactory;
+    service.dataSource = dataSource;
+    service.txFactory = txFactory;
+    return service;
+	}
+	
+	protected static SqlSessionFactory createMyBatisSqlSessionFactory(InputStream config, DataSource dataSource, TransactionFactory txFactory) {
 
-    // use ManagedTransactionFactory if you work in a transactional
-    // environment (e.g. called within the engine or using JTA)
-	  
-    TransactionFactory transactionFactory = new ManagedTransactionFactory();
-
-    Environment environment = new Environment("cmmn-prediction", transactionFactory, dataSource);
+    Environment environment = new Environment("cmmn-prediction", txFactory, dataSource);
 
     XMLConfigBuilder parser = new XMLConfigBuilder(new InputStreamReader(config));
     

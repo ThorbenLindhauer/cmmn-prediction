@@ -26,7 +26,6 @@ import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel;
 import org.camunda.bpm.hackdays.prediction.model.ParsedPredictionModel.ExpressionBasedVariable;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
-import org.camunda.bpm.model.cmmn.instance.Task;
 
 import com.github.thorbenlindhauer.learning.prior.ConditionalDiscreteDistributionPrior;
 

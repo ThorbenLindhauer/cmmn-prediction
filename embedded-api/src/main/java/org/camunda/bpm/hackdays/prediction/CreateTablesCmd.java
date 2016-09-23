@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class CreateTablesCmd implements Command<Void> {
 
@@ -22,10 +23,20 @@ public class CreateTablesCmd implements Command<Void> {
 		
 		String sqlString = new String(sqlBytes, StandardCharsets.UTF_8);
 		
+		Statement statement = null;
 		try {
-			dbConnection.createStatement().execute(sqlString);
+		  statement = dbConnection.createStatement();
+      statement.execute(sqlString);
 		} catch (SQLException e) {
 			throw new CmmnPredictionException("Could not create tables", e);
+		} finally {
+		  try {
+		    if (statement != null) {
+		      statement.close();
+		    }
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
 		}
 		
 		return null;

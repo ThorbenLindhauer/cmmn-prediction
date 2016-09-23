@@ -46,7 +46,6 @@ public class PredictionResource extends AbstractCockpitPluginResource {
     
     List<CasePredictionTO> result = new ArrayList<CasePredictionTO>();
     
-    Map<String, Object> variables = caseService.getVariables(caseInstanceId);
     String caseDefinitionId = caseService.createCaseExecutionQuery()
         .caseExecutionId(caseInstanceId).singleResult().getCaseDefinitionId();
     
@@ -69,6 +68,8 @@ public class PredictionResource extends AbstractCockpitPluginResource {
     }
     
     ParsedPredictionModel parsedModel = predictionService.parseModel(model);
+    
+    Map<String, Object> variables = caseService.getVariables(caseInstanceId);
     
     for (String planItemId : planItemIds) {
       if (!parsedModel.getVariables().containsKey(planItemId)) {
