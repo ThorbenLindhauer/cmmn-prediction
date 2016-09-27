@@ -166,4 +166,6 @@ In this application of Bayesian networks, we choose the involved distributions t
 
 ## Building from source
 
-* before building, clone repository https://github.com/ThorbenLindhauer/graphical-models and build modules
+* Run `mvn clean install` in the root folder
+* `process-engine-plugin/target/dependency` then contains the process engine plugin with all required dependencies
+* The `cockpit-plugin` artifact can be added to the Camunda EE web application. It requires that the `embedded-api` artifact and its dependencies are accessible from the webapp's classloader

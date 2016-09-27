@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.1">
   <cmmn:case id="CarEvaluation">
-    <cmmn:casePlanModel id="CasePlanModel_1" name="Car Evaluation">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="Car Evaluation" autoComplete="false">
       <cmmn:planItem id="PlanItem_Estimate_Value" definitionRef="HumanTask_0v5maen">
         <cmmn:itemControl id="PlanItemControl_1fx1naj">
-          <cmmn:requiredRule id="RequiredRule_03flki4">
-            <cmmn:condition id="Expression_0ijxpeh">${false}</cmmn:condition>
-          </cmmn:requiredRule>
           <cmmn:manualActivationRule id="ManualActivationRule_073jgji">
             <cmmn:condition id="Expression_1qlqaqe">${true}</cmmn:condition>
           </cmmn:manualActivationRule>
@@ -14,9 +11,6 @@
       </cmmn:planItem>
       <cmmn:planItem id="PlanItem_Test_Drive" definitionRef="HumanTask_17kr5ew">
         <cmmn:itemControl id="PlanItemControl_07rqnfu">
-          <cmmn:requiredRule id="RequiredRule_1122qfg">
-            <cmmn:condition id="Expression_0okipxh">${false}</cmmn:condition>
-          </cmmn:requiredRule>
           <cmmn:manualActivationRule id="ManualActivationRule_0h8up20">
             <cmmn:condition id="Expression_0ayf3rx">${true}</cmmn:condition>
           </cmmn:manualActivationRule>
